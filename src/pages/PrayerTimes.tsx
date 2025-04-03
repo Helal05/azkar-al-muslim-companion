@@ -28,6 +28,19 @@ const PrayerTimes = () => {
       localStorage.setItem("prayer_notifications", JSON.stringify(initialSettings));
     }
     
+    // Get user's location for accurate prayer times
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const { latitude, longitude } = position.coords;
+          setPrayerTimes(getPrayerTimes(latitude, longitude));
+        },
+        (error) => {
+          console.log("Error getting location:", error);
+        }
+      );
+    }
+    
     // Update countdown timer every minute
     const interval = setInterval(() => {
       setNextPrayerTime(getTimeToNextPrayer());
@@ -53,6 +66,21 @@ const PrayerTimes = () => {
     });
     
     // In a real app, we would register or unregister notifications here
+    if (!notificationsEnabled[prayerName]) {
+      // This would need a proper notification implementation using the Web Notifications API
+      if (Notification.permission === "granted") {
+        scheduleNotification(prayerName);
+      } else {
+        requestNotificationPermission();
+      }
+    }
+  };
+  
+  // Schedule prayer notification
+  const scheduleNotification = (prayerName: string) => {
+    // This is a placeholder. In a real app, we would calculate the exact time
+    // and set a timeout to show a notification at the prayer time
+    console.log(`Notification scheduled for ${prayerName}`);
   };
   
   // Request notification permissions if needed
@@ -72,6 +100,11 @@ const PrayerTimes = () => {
           title: "تم تفعيل الإشعارات",
           description: "ستتلقى إشعارات بأوقات الصلاة"
         });
+        
+        // After permission granted, register all enabled notifications
+        Object.entries(notificationsEnabled).forEach(([name, enabled]) => {
+          if (enabled) scheduleNotification(name);
+        });
       } else {
         toast({
           title: "لم يتم السماح بالإشعارات",
@@ -90,6 +123,12 @@ const PrayerTimes = () => {
   };
   
   const forbiddenTimes = getForbiddenPrayerTimes();
+  
+  // Calculate remaining time to prayer more accurately
+  const calculateRemainingTime = (prayer: any) => {
+    // This is a placeholder. In a real app, we would calculate this based on actual time
+    return "45:22"; // Example format
+  };
 
   return (
     <div className="min-h-screen bg-black flex flex-col">
@@ -129,7 +168,7 @@ const PrayerTimes = () => {
       
       {/* Prayer Times List with Notification Toggles */}
       <div className="flex-1 bg-black">
-        {prayerTimes.map((prayer) => (
+        {prayerTimes.slice(0, 6).map((prayer) => (
           <div 
             key={prayer.name}
             className={`px-4 py-3 flex justify-between items-center border-b border-gray-800 ${

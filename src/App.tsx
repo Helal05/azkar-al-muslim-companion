@@ -41,7 +41,7 @@ const App = () => (
           <Route path="/prayer-times" element={<PrayerTimes />} />
           <Route path="/sunnah-prayers" element={<SunnahPrayers />} />
           <Route path="/duha-prayer" element={<DuhaPrayer />} />
-          <Route path="/forbidden-times" element={<PrayerTimes />} /> {/* Reuse the prayer times page for now */}
+          <Route path="/forbidden-times" element={<PrayerTimes />} />
           <Route path="/more" element={<More />} />
           <Route path="/dua-category/:categoryId" element={<DuaCategory />} />
           <Route path="/favorites" element={<Favorites />} />

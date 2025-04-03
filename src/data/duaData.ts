@@ -1,3 +1,9 @@
+export interface Dua {
+  title: string;
+  arabic: string;
+  translation: string;
+  source: string;
+}
 
 export interface DuaCategory {
   id: string;
@@ -6,147 +12,135 @@ export interface DuaCategory {
   duas: Dua[];
 }
 
-export interface Dua {
-  id: string;
-  title: string;
-  arabic: string;
-  translation?: string;
-  transliteration?: string;
-  reference: string;
-  virtue?: string;
-  times?: number;
-}
-
 export const duaCategories: DuaCategory[] = [
   {
-    id: "sick",
-    name: "من أتى مريضًا",
-    backgroundColor: "bg-green-200",
+    id: "morning",
+    name: "أذكار الصباح",
+    backgroundColor: "bg-gradient-to-br from-yellow-400 to-yellow-600",
     duas: [
       {
-        id: "sick-visit",
-        title: "دعاء من أتى مريضًا",
-        arabic: "اللَّهُمَّ رَبَّ النَّاسِ، أَذْهِبِ البَاسَ، اشْفِ أَنْتَ الشَّافِي، لا شِفَاءَ إِلا شِفَاؤُكَ، شِفَاءً لا يُغَادِرُ سَقَمًا",
-        reference: "رواه البخاري",
-        times: 7
+        title: "دعاء الصباح 1",
+        arabic: "أَصْبَحْنَا وَأَصْبَحَ الْمُلْكُ لِلَّهِ",
+        translation: "We have entered a new day and with it all dominion belongs to Allah.",
+        source: "صحيح البخاري"
+      },
+      {
+        title: "دعاء الصباح 2",
+        arabic: "اللَّهُمَّ بِكَ أَصْبَحْنَا وَبِكَ أَمْسَيْنَا",
+        translation: "O Allah, by Your grace we have entered a new day, and by Your grace we enter the evening.",
+        source: "سنن الترمذي"
       }
     ]
   },
   {
-    id: "sick-prayer",
-    name: "الدعاء للمريض في عيادته",
-    backgroundColor: "bg-blue-200",
+    id: "evening",
+    name: "أذكار المساء",
+    backgroundColor: "bg-gradient-to-br from-indigo-500 to-indigo-700",
     duas: [
       {
-        id: "sick-prayer-1",
-        title: "الدعاء للمريض",
-        arabic: "لا بَأْسَ طَهُورٌ إِنْ شَاءَ اللَّهُ",
-        reference: "رواه البخاري",
-        virtue: "دعاء الرسول صلى الله عليه وسلم للمريض"
+        title: "دعاء المساء 1",
+        arabic: "أَمْسَيْنَا وَأَمْسَى الْمُلْكُ لِلَّهِ",
+        translation: "We have entered the evening and with it all dominion belongs to Allah.",
+        source: "صحيح البخاري"
+      },
+      {
+        title: "دعاء المساء 2",
+        arabic: "اللَّهُمَّ مَا أَمْسَى بِي مِنْ نِعْمَةٍ",
+        translation: "O Allah, whatever blessing I have this evening.",
+        source: "سنن أبي داود"
       }
     ]
   },
   {
-    id: "marriage",
-    name: "الدعاء للمتزوج",
-    backgroundColor: "bg-gray-200",
+    id: "beforeSleep",
+    name: "أذكار قبل النوم",
+    backgroundColor: "bg-gradient-to-br from-purple-500 to-purple-700",
     duas: [
       {
-        id: "marriage-1",
-        title: "الدعاء للمتزوج",
-        arabic: "بَارَكَ اللَّهُ لَكَ، وَبَارَكَ عَلَيْكَ، وَجَمَعَ بَيْنَكُما فِي خَيْرٍ",
-        reference: "رواه أبو داود والترمذي",
-        virtue: "دعاء النبي صلى الله عليه وسلم للمتزوج"
+        title: "دعاء قبل النوم 1",
+        arabic: "بِاسْمِكَ رَبِّي وَضَعْتُ جَنْبِي",
+        translation: "In Your name, my Lord, I lie down.",
+        source: "صحيح البخاري"
+      },
+      {
+        title: "دعاء قبل النوم 2",
+        arabic: "اللَّهُمَّ إِنِّي أَسْلَمْتُ نَفْسِي إِلَيْكَ",
+        translation: "O Allah, I have submitted myself to You.",
+        source: "صحيح البخاري"
       }
     ]
   },
   {
-    id: "new-wife",
-    name: "دعاء المتزوج وشراء الدابة",
-    backgroundColor: "bg-amber-200",
+    id: "afterPrayer",
+    name: "أذكار بعد الصلاة",
+    backgroundColor: "bg-gradient-to-br from-green-500 to-green-700",
     duas: [
       {
-        id: "new-wife-1",
-        title: "دعاء الدخول بالزوجة",
-        arabic: "اللَّهُمَّ إِنِّي أَسْأَلُكَ خَيْرَهَا، وَخَيْرَ مَا جَبَلْتَهَا عَلَيْهِ، وَأَعُوذُ بِكَ مِنْ شَرِّهَا، وَشَرِّ مَا جَبَلْتَهَا عَلَيْهِ",
-        reference: "رواه أبو داود وابن ماجه",
-        virtue: "دعاء النبي صلى الله عليه وسلم"
+        title: "دعاء بعد الصلاة 1",
+        arabic: "أَسْتَغْفِرُ اللَّهَ",
+        translation: "I seek forgiveness from Allah.",
+        source: "صحيح مسلم"
+      },
+      {
+        title: "دعاء بعد الصلاة 2",
+        arabic: "اللَّهُمَّ أَنْتَ السَّلَامُ",
+        translation: "O Allah, You are Peace.",
+        source: "صحيح مسلم"
       }
     ]
   },
   {
-    id: "children",
-    name: "مايعوذ به الأولاد",
-    backgroundColor: "bg-pink-200",
+    id: "general",
+    name: "أدعية عامة",
+    backgroundColor: "bg-gradient-to-br from-blue-500 to-blue-700",
     duas: [
       {
-        id: "children-protection",
-        title: "تعويذ الأطفال",
-        arabic: "أُعِيذُكُمَا بِكَلِمَاتِ اللَّهِ التَّامَّةِ، مِنْ كُلِّ شَيْطَانٍ وَهَامَّةٍ، وَمِنْ كُلِّ عَيْنٍ لَامَّةٍ",
-        reference: "رواه البخاري",
-        virtue: "كان إبراهيم يعوذ بها إسماعيل وإسحاق"
+        title: "دعاء عام 1",
+        arabic: "رَبَّنَا آتِنَا فِي الدُّنْيَا حَسَنَةً",
+        translation: "Our Lord, give us good in this world.",
+        source: "سورة البقرة"
+      },
+      {
+        title: "دعاء عام 2",
+        arabic: "رَبَّنَا لَا تُؤَاخِذْنَا إِنْ نَسِينَا",
+        translation: "Our Lord, do not take us to task if we forget.",
+        source: "سورة البقرة"
       }
     ]
   },
   {
-    id: "before-intercourse",
-    name: "الدعاء قبل الجماع",
-    backgroundColor: "bg-amber-200",
+    id: "forForgiveness",
+    name: "أدعية طلب المغفرة",
+    backgroundColor: "bg-gradient-to-br from-gray-500 to-gray-700",
     duas: [
       {
-        id: "intercourse-1",
-        title: "دعاء الجماع",
-        arabic: "بِسْمِ اللَّهِ، اللَّهُمَّ جَنِّبْنَا الشَّيْطَانَ، وَجَنِّبِ الشَّيْطَانَ مَا رَزَقْتَنَا",
-        reference: "متفق عليه",
-        virtue: "إذا أراد أحدكم أن يأتي أهله فقال... فقضي بينهما ولد لم يضره الشيطان أبداً"
-      }
-    ]
-  },
-  {
-    id: "love-in-allah",
-    name: "الدعاء لمن قال إني أحبك في الله",
-    backgroundColor: "bg-sky-200",
-    duas: [
+        title: "دعاء طلب المغفرة 1",
+        arabic: "رَبِّ اغْفِرْ لِي وَلِوَالِدَيَّ",
+        translation: "My Lord, forgive me and my parents.",
+        source: "سورة نوح"
+      },
       {
-        id: "love-in-allah-1",
-        title: "الرد على من قال أحبك في الله",
-        arabic: "أَحَبَّكَ الَّذِي أَحْبَبْتَنِي لَهُ",
-        reference: "رواه أبو داود بإسناد صحيح",
-        virtue: "دعاء النبي صلى الله عليه وسلم"
-      }
-    ]
-  },
-  // Many more categories would be here
-  {
-    id: "riding",
-    name: "دعاء الركوب (السيارة و ما نحوه)",
-    backgroundColor: "bg-blue-200",
-    duas: [
-      {
-        id: "riding-1",
-        title: "دعاء ركوب السيارة ونحوها",
-        arabic: "بِسْمِ اللَّهِ، الْحَمْدُ لِلَّهِ ﴿سُبْحَانَ الَّذِي سَخَّرَ لَنَا هَذَا وَمَا كُنَّا لَهُ مُقْرِنِينَ * وَإِنَّا إِلَى رَبِّنَا لَمُنْقَلِبُونَ﴾ الْحَمْدُ لِلَّهِ، الْحَمْدُ لِلَّهِ، الْحَمْدُ لِلَّهِ، اللَّهُ أَكْبَرُ، اللَّهُ أَكْبَرُ، اللَّهُ أَكْبَرُ، سُبْحَانَكَ اللَّهُمَّ إِنِّي ظَلَمْتُ نَفْسِي فَاغْفِرْ لِي، فَإِنَّهُ لا يَغْفِرُ الذُّنُوبَ إِلاَّ أَنْتَ",
-        reference: "رواه أبو داود والترمذي",
-        virtue: "دعاء النبي صلى الله عليه وسلم عند السفر"
-      }
-    ]
-  },
-  {
-    id: "difficulty",
-    name: "دعاء من استصعب عليه أمر",
-    backgroundColor: "bg-purple-200",
-    duas: [
-      {
-        id: "difficulty-1",
-        title: "عند مواجهة الصعوبات",
-        arabic: "اللَّهُمَّ لَا سَهْلَ إِلَّا مَا جَعَلْتَهُ سَهْلًا، وَأَنْتَ تَجْعَلُ الْحَزْنَ إِذَا شِئْتَ سَهْلًا",
-        reference: "رواه ابن حبان في صحيحه",
-        virtue: "دعاء النبي صلى الله عليه وسلم"
+        title: "دعاء طلب المغفرة 2",
+        arabic: "اللَّهُمَّ إِنَّكَ عَفُوٌّ تُحِبُّ الْعَفْوَ",
+        translation: "O Allah, You are forgiving and love forgiveness.",
+        source: "سنن الترمذي"
       }
     ]
   }
 ];
 
+// Add natural background images
+export const naturalBackgrounds = [
+  "https://images.unsplash.com/photo-1472396961693-142e6e269027?auto=format&fit=crop&q=80",
+  "https://images.unsplash.com/photo-1433086966358-54859d0ed716?auto=format&fit=crop&q=80",
+  "https://images.unsplash.com/photo-1482938289607-e9573fc25ebb?auto=format&fit=crop&q=80",
+  "https://images.unsplash.com/photo-1509316975850-ff9c5deb0cd9?auto=format&fit=crop&q=80",
+  "https://images.unsplash.com/photo-1513836279014-a89f7a76ae86?auto=format&fit=crop&q=80",
+  "https://images.unsplash.com/photo-1518495973542-4542c06a5843?auto=format&fit=crop&q=80",
+  "https://images.unsplash.com/photo-1469474968028-56623f02e42e?auto=format&fit=crop&q=80",
+];
+
+// Add more Quranic verses
 export const quranVerses = [
   {
     verse: "إِنَّ اللَّهَ عَلِيمٌ خَبِيرٌ",
@@ -154,9 +148,9 @@ export const quranVerses = [
     ayah: 13
   },
   {
-    verse: "وَرَبُّكَ يَخْلُقُ مَا يَشَاءُ وَيَخْتَارُ",
-    surah: "القصص",
-    ayah: 68
+    verse: "وَاللَّهُ يَعْلَمُ وَأَنْتُمْ لَا تَعْلَمُونَ",
+    surah: "البقرة",
+    ayah: 216
   },
   {
     verse: "وَمَا تَوْفِيقِي إِلَّا بِاللَّهِ عَلَيْهِ تَوَكَّلْتُ وَإِلَيْهِ أُنِيبُ",
@@ -164,74 +158,38 @@ export const quranVerses = [
     ayah: 88
   },
   {
+    verse: "إِنَّ اللَّهَ مَعَ الصَّابِرِينَ",
+    surah: "البقرة",
+    ayah: 153
+  },
+  {
+    verse: "وَنَحْنُ أَقْرَبُ إِلَيْهِ مِنْ حَبْلِ الْوَرِيدِ",
+    surah: "ق",
+    ayah: 16
+  },
+  {
+    verse: "قُلْ هُوَ اللَّهُ أَحَدٌ ۝ اللَّهُ الصَّمَدُ",
+    surah: "الإخلاص",
+    ayah: "1-2"
+  },
+  {
+    verse: "وَإِلَٰهُكُمْ إِلَٰهٌ وَاحِدٌ لَّا إِلَٰهَ إِلَّا هُوَ الرَّحْمَٰنُ الرَّحِيمُ",
+    surah: "البقرة",
+    ayah: 163
+  },
+  {
     verse: "إِنَّ مَعَ الْعُسْرِ يُسْرًا",
     surah: "الشرح",
     ayah: 6
   },
   {
-    verse: "وَاللَّهُ غَالِبٌ عَلَىٰ أَمْرِهِ وَلَٰكِنَّ أَكْثَرَ النَّاسِ لَا يَعْلَمُونَ",
-    surah: "يوسف",
-    ayah: 21
+    verse: "وَإِنْ تَعُدُّوا نِعْمَةَ اللَّهِ لَا تُحْصُوهَا",
+    surah: "إبراهيم",
+    ayah: 34
+  },
+  {
+    verse: "وَمَنْ يَتَوَكَّلْ عَلَى اللَّهِ فَهُوَ حَسْبُهُ",
+    surah: "الطلاق",
+    ayah: 3
   }
 ];
-
-export const nightPrayerDuas = [
-  {
-    id: "night-1",
-    arabic: "اللَّهُمَّ لَكَ الْحَمْدُ أَنْتَ قَيِّمُ السَّمَوَاتِ وَالْأَرْضِ وَمَنْ فِيهِنَّ...",
-    reference: "رواه البخاري",
-    virtue: "دعاء النبي صلى الله عليه وسلم إذا قام من الليل"
-  },
-  {
-    id: "night-2",
-    arabic: "اللَّهُمَّ رَبَّنَا لَكَ الْحَمْدُ أَنْتَ نُورُ السَّمَوَاتِ وَالْأَرْضِ وَمَنْ فِيهِنَّ...",
-    reference: "رواه مسلم",
-    virtue: "دعاء من تعار من الليل"
-  }
-];
-
-export const naturalBackgrounds = [
-  "/lovable-uploads/812d900a-534c-4796-b570-e999efe94886.png",
-  "https://images.unsplash.com/photo-1518173946687-a4c8892bbd9f?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=987&q=80",
-  "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2073&q=80",
-  "https://images.unsplash.com/photo-1502082553048-f009c37129b9?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2070&q=80"
-];
-
-export const rawathib = [
-  {
-    prayer: "الفجر",
-    before: 2,
-    after: 0,
-    description: "ركعتان خفيفتان قبل الفريضة"
-  },
-  {
-    prayer: "الظهر",
-    before: 4,
-    after: 2,
-    description: "أربع ركعات قبل الفريضة وركعتان بعدها"
-  },
-  {
-    prayer: "العصر",
-    before: 2,
-    after: 0,
-    description: "ركعتان قبل الفريضة (غير مؤكدة)"
-  },
-  {
-    prayer: "المغرب",
-    before: 0,
-    after: 2,
-    description: "ركعتان بعد الفريضة"
-  },
-  {
-    prayer: "العشاء",
-    before: 0,
-    after: 2,
-    description: "ركعتان بعد الفريضة"
-  }
-];
-
-export const duha = {
-  time: "من ارتفاع الشمس قدر رمح إلى قبيل الزوال",
-  rakaat: "من ركعتين إلى ثمان ركعات أو اثنتي عشرة ركعة",
-  virtue: "يكتب له أجر صدقة على كل سلامى من جسده، وهي تعدل حجة وعمرة"
-};
