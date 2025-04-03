@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
-import { Refresh, ChevronLeft, ChevronRight, Settings, List } from "lucide-react";
+import { RefreshCw, ChevronLeft, ChevronRight, Settings, List } from "lucide-react";
 import { azkarItems } from "../data/azkarData";
 
 const tasbihItems = azkarItems.filter(item => item.category === "tasbih");
@@ -153,7 +153,7 @@ const Tasbih = () => {
             onClick={resetCount}
             className="p-3 bg-gray-900 rounded-full text-white"
           >
-            <Refresh className="h-6 w-6" />
+            <RefreshCw className="h-6 w-6" />
           </button>
           
           <button
