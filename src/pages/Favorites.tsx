@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { duaCategories } from "../data/duaData";
@@ -51,6 +50,7 @@ const Favorites = () => {
             ...dua,
             categoryId: category.id,
             categoryName: category.name,
+            reference: dua.reference || dua.source,
             type: 'dua'
           });
         }

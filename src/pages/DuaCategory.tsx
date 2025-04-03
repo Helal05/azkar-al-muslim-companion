@@ -62,12 +62,13 @@ const DuaCategory = () => {
   const shareDua = (dua: {
     title: string;
     arabic: string;
-    reference: string;
+    reference?: string;
+    source?: string;
   }) => {
     if (navigator.share) {
       navigator.share({
         title: dua.title,
-        text: `${dua.arabic}\n\n${dua.reference}`,
+        text: `${dua.arabic}\n\n${dua.reference || dua.source}`,
         url: window.location.href
       }).catch(err => console.error("Error sharing:", err));
     } else {
@@ -140,7 +141,7 @@ const DuaCategory = () => {
                 
                 <div className="flex justify-between items-center mt-2">
                   <p className="font-arabic text-gray-400 text-sm">
-                    {dua.reference}
+                    {dua.reference || dua.source}
                   </p>
                   
                   {dua.times && dua.times > 1 && (

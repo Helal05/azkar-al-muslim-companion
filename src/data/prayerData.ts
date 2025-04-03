@@ -21,7 +21,7 @@ export interface ForbiddenPrayerTime {
 const toArabicNumerals = (num: number): string => {
   const arabicNumerals = ['٠', '١', '٢', '٣', '٤', '٥', '٦', '٧', '٨', '٩'];
   return num.toString().split('').map(digit => {
-    return arabicNumerals[parseInt(digit)] || digit;
+    return arabicNumerals[parseInt(digit, 10)] || digit;
   }).join('');
 };
 
