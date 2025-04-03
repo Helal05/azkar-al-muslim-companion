@@ -4,6 +4,7 @@
 @tailwind utilities;
 
 @import url('https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Scheherazade+New:wght@400;700&display=swap');
 
 @layer base {
   :root {
@@ -100,29 +101,46 @@
     direction: rtl;
   }
 
+  .font-arabic {
+    font-family: 'Scheherazade New', 'Amiri', serif;
+  }
+
   .tasbih-button {
     @apply bg-islamic-green/90 hover:bg-islamic-green rounded-full flex items-center justify-center shadow-lg transition-all duration-300 active:scale-95 active:shadow-md;
   }
 
   .pattern-bg {
     background-color: hsl(var(--background));
-    background-image: url("data:image/svg+xml,%3Csvg width='80' height='80' viewBox='0 0 80 80' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%234A8262' fill-opacity='0.07'%3E%3Cpath d='M50 50c0-5.523 4.477-10 10-10s10 4.477 10 10-4.477 10-10 10c0 5.523-4.477 10-10 10s-10-4.477-10-10 4.477-10 10-10zM10 10c0-5.523 4.477-10 10-10s10 4.477 10 10-4.477 10-10 10c0 5.523-4.477 10-10 10S0 25.523 0 20s4.477-10 10-10zm10 8c4.418 0 8-3.582 8-8s-3.582-8-8-8-8 3.582-8 8 3.582 8 8 8zm40 40c4.418 0 8-3.582 8-8s-3.582-8-8-8-8 3.582-8 8 3.582 8 8 8z' /%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    background-image: url("data:image/svg+xml,%3Csvg width='80' height='80' viewBox='0 0 80 80' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%234A8262' fill-opacity='0.07'%3E%3Cpath d='M50,20 L55,35 L70,35 L60,45 L65,60 L50,50 L35,60 L40,45 L30,35 L45,35 L50,20 Z' /%3E%3Cpath d='M50,80 L45,65 L30,65 L40,55 L35,40 L50,50 L65,40 L60,55 L70,65 L55,65 L50,80 Z' /%3E%3Cpath d='M20,50 L35,45 L35,30 L45,40 L60,35 L50,50 L60,65 L45,60 L35,70 L35,55 L20,50 Z' /%3E%3Cpath d='M80,50 L65,55 L65,70 L55,60 L40,65 L50,50 L40,35 L55,40 L65,30 L65,45 L80,50 Z' /%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
   }
 
   .category-card {
-    @apply relative overflow-hidden bg-white dark:bg-islamic-green-dark/30 rounded-xl shadow-md hover:shadow-lg transition-all duration-300 p-5 flex flex-col items-center justify-center text-center space-y-2;
-  }
-
-  .category-card::before {
-    content: '';
-    @apply absolute inset-0 bg-islamic-pattern bg-opacity-5 opacity-10;
+    @apply relative overflow-hidden bg-black border border-gray-800 rounded-lg p-4 flex flex-col items-center justify-center text-center;
   }
 
   .azkar-card {
-    @apply bg-white dark:bg-islamic-green-dark/30 rounded-xl shadow-md p-6 my-4 max-w-2xl mx-auto relative overflow-hidden border border-islamic-neutral-dark/20;
+    @apply bg-black text-white rounded-lg p-6 my-4;
   }
 
   .counter-badge {
-    @apply bg-islamic-blue-light dark:bg-islamic-blue-dark text-islamic-blue-dark dark:text-islamic-blue-light px-3 py-1 rounded-full text-sm font-semibold;
+    @apply bg-gray-800 text-white px-3 py-1 rounded-full text-sm font-mono;
   }
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #1a1a1a;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #333;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
 }

@@ -3,9 +3,8 @@ import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { azkarItems, azkarCategories } from "../data/azkarData";
-import Header from "../components/Header";
 import { useToast } from "@/hooks/use-toast";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, List, Share } from "lucide-react";
 
 const AzkarList = () => {
   const { categoryId } = useParams<{ categoryId: string }>();
@@ -42,10 +41,18 @@ const AzkarList = () => {
   
   if (!category || categoryAzkar.length === 0) {
     return (
-      <div className="min-h-screen pattern-bg flex flex-col">
-        <Header />
+      <div className="min-h-screen bg-black flex flex-col">
+        <div className="bg-black text-white p-4 flex justify-between items-center">
+          <button onClick={() => navigate("/")} className="p-2">
+            <ChevronRight className="w-5 h-5" />
+          </button>
+          <h2 className="text-xl font-arabic font-bold">
+            {category?.name || "الأذكار"}
+          </h2>
+          <div className="w-5"></div>
+        </div>
         <div className="flex-1 flex items-center justify-center">
-          <p className="text-xl font-arabic text-islamic-green-dark dark:text-islamic-neutral">
+          <p className="text-xl font-arabic text-gray-400">
             لا توجد أذكار في هذا القسم
           </p>
         </div>
@@ -90,80 +97,113 @@ const AzkarList = () => {
   };
   
   return (
-    <div className="min-h-screen pattern-bg flex flex-col">
-      <Header />
+    <div className="min-h-screen bg-black flex flex-col">
+      {/* Header */}
+      <div className="bg-black text-white p-4 flex justify-between items-center">
+        <button onClick={() => navigate("/")} className="p-2">
+          <List className="w-5 h-5" />
+        </button>
+        <h2 className="text-xl font-arabic font-bold">
+          {category.name}
+        </h2>
+        <button className="p-2">
+          <ChevronRight className="w-5 h-5" />
+        </button>
+      </div>
       
-      <div className="container mx-auto px-4 py-6 flex-1 flex flex-col">
-        <div className="mb-6 text-center">
-          <h2 className="text-2xl font-arabic font-bold text-islamic-green-dark dark:text-islamic-neutral">
-            {category.name}
-          </h2>
-          <p className="text-sm text-gray-600 dark:text-gray-300">
-            {currentIndex + 1} / {categoryAzkar.length}
-          </p>
-        </div>
-        
-        <div className="flex-1 flex flex-col">
-          <motion.div 
-            key={currentIndex}
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -20 }}
-            className="flex-1 flex flex-col"
+      {/* Azkar Content */}
+      <div className="flex-1 flex flex-col p-2">
+        <motion.div 
+          key={currentIndex}
+          initial={{ opacity: 0, x: 20 }}
+          animate={{ opacity: 1, x: 0 }}
+          exit={{ opacity: 0, x: -20 }}
+          className="flex-1 flex flex-col"
+        >
+          <div 
+            className="flex-1 flex flex-col bg-black p-4"
+            onClick={decrementCounter}
           >
-            <div 
-              className="azkar-card flex-1 flex flex-col"
-              onClick={decrementCounter}
-            >
-              <div className="arabic-text text-xl mb-6 flex-1 flex items-center justify-center">
-                {currentAzkar.text}
-              </div>
-              
-              <div className="mt-4 flex flex-col space-y-2">
-                <div className="flex justify-between items-center">
-                  <span className="counter-badge">
-                    {counter} / {currentAzkar.count}
-                  </span>
-                  
-                  {currentAzkar.reference && (
-                    <span className="text-sm text-gray-500 dark:text-gray-400 arabic-text">
-                      {currentAzkar.reference}
-                    </span>
-                  )}
-                </div>
-                
-                {currentAzkar.translation && (
-                  <p className="text-sm text-gray-600 dark:text-gray-300 mt-4">
-                    {currentAzkar.translation}
+            <div className="arabic-text text-xl font-bold mb-6 flex-1 flex items-center justify-center text-white leading-loose">
+              {currentAzkar.text}
+            </div>
+            
+            {currentAzkar.benefit && (
+              <div className="mt-4 mb-4">
+                <p className="text-cyan-400 font-arabic text-base text-right">
+                  {currentAzkar.benefit}
+                </p>
+                {currentAzkar.reference && (
+                  <p className="text-gray-500 text-sm font-arabic text-right">
+                    ({currentAzkar.reference})
                   </p>
                 )}
               </div>
-            </div>
-          </motion.div>
+            )}
+            
+            {currentAzkar.suraVerse && (
+              <p className="text-gray-500 text-sm font-arabic text-right">
+                ({currentAzkar.suraVerse})
+              </p>
+            )}
+          </div>
+        </motion.div>
+        
+        {/* Bottom Navigation and Controls */}
+        <div className="bg-gray-900 p-4 flex items-center justify-between border-t border-gray-800">
+          <span className="text-white font-mono">
+            {currentIndex + 1}/{categoryAzkar.length}
+          </span>
           
-          <div className="mt-6 flex justify-between">
-            <button 
-              onClick={goToPrevious}
-              disabled={currentIndex === 0}
-              className={`p-3 rounded-full ${
-                currentIndex === 0 
-                  ? 'bg-gray-200 text-gray-400 cursor-not-allowed dark:bg-gray-700 dark:text-gray-500' 
-                  : 'bg-islamic-blue dark:bg-islamic-blue-dark text-white hover:bg-islamic-blue-dark'
-              }`}
-            >
-              <ChevronRight className="w-5 h-5" />
+          <div className="flex space-x-4 rtl:space-x-reverse">
+            <button className="text-white">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
+              </svg>
             </button>
             
             <button 
-              onClick={goToNext}
-              disabled={currentIndex === categoryAzkar.length - 1}
-              className={`p-3 rounded-full ${
-                currentIndex === categoryAzkar.length - 1 
-                  ? 'bg-gray-200 text-gray-400 cursor-not-allowed dark:bg-gray-700 dark:text-gray-500' 
-                  : 'bg-islamic-blue dark:bg-islamic-blue-dark text-white hover:bg-islamic-blue-dark'
+              onClick={() => {
+                toast({
+                  title: "مشاركة",
+                  description: "سيتم إضافة ميزة المشاركة قريبًا إن شاء الله",
+                });
+              }}
+              className="text-white"
+            >
+              <Share className="h-6 w-6" />
+            </button>
+            
+            <button
+              onClick={goToPrevious}
+              disabled={currentIndex === 0}
+              className={`p-1 rounded-full ${
+                currentIndex === 0 
+                  ? 'text-gray-500 cursor-not-allowed' 
+                  : 'text-white'
               }`}
             >
-              <ChevronLeft className="w-5 h-5" />
+              <ChevronRight className="w-6 h-6" />
+            </button>
+            
+            {/* Counter Badge */}
+            <button 
+              onClick={decrementCounter}
+              className="bg-gray-800 text-white px-3 py-1 rounded-full text-sm font-mono"
+            >
+              {counter}/{currentAzkar.count}
+            </button>
+            
+            <button
+              onClick={goToNext}
+              disabled={currentIndex === categoryAzkar.length - 1}
+              className={`p-1 rounded-full ${
+                currentIndex === categoryAzkar.length - 1 
+                  ? 'text-gray-500 cursor-not-allowed' 
+                  : 'text-white'
+              }`}
+            >
+              <ChevronLeft className="w-6 h-6" />
             </button>
           </div>
         </div>
