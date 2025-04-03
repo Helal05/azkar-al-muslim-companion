@@ -1,4 +1,3 @@
-
 export interface PrayerTime {
   name: string;
   time: string;
@@ -21,7 +20,10 @@ export interface ForbiddenPrayerTime {
 const toArabicNumerals = (num: number): string => {
   const arabicNumerals = ['٠', '١', '٢', '٣', '٤', '٥', '٦', '٧', '٨', '٩'];
   return num.toString().split('').map(digit => {
-    return arabicNumerals[parseInt(digit, 10)] || digit;
+    // Convert digit to number explicitly to ensure it's a number
+    const digitNum = parseInt(digit, 10);
+    // Check if it's a valid number before accessing the array
+    return !isNaN(digitNum) ? arabicNumerals[digitNum] : digit;
   }).join('');
 };
 
@@ -29,7 +31,7 @@ const toArabicNumerals = (num: number): string => {
 const formatArabicTime = (hour: number, minute: number): string => {
   const period = hour < 12 ? 'ص' : 'م';
   const h = hour % 12 || 12;
-  return `${period} ${toArabicNumerals(h)}:${toArabicNumerals(minute.toString().padStart(2, '0'))}`;
+  return `${period} ${toArabicNumerals(h)}:${toArabicNumerals(minute)}`;
 };
 
 export const getCurrentIslamicDate = (): IslamicDate => {
