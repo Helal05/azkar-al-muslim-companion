@@ -3,8 +3,9 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { getCurrentIslamicDate, getPrayerTimes, getTimeToNextPrayer, getForbiddenPrayerTimes } from "../data/prayerData";
 import { useToast } from "@/hooks/use-toast";
-import { ChevronLeft, Bell, BellOff } from "lucide-react";
+import { ChevronLeft, Bell } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
+import { naturalBackgrounds } from "../data/duaData";
 
 const PrayerTimes = () => {
   const navigate = useNavigate();
@@ -13,6 +14,7 @@ const PrayerTimes = () => {
   const [prayerTimes, setPrayerTimes] = useState(getPrayerTimes());
   const [nextPrayerTime, setNextPrayerTime] = useState(getTimeToNextPrayer());
   const [notificationsEnabled, setNotificationsEnabled] = useState<Record<string, boolean>>({});
+  const [backgroundIndex, setBackgroundIndex] = useState(0);
   
   useEffect(() => {
     // Initialize notification settings for each prayer time
@@ -46,7 +48,15 @@ const PrayerTimes = () => {
       setNextPrayerTime(getTimeToNextPrayer());
     }, 60000);
     
-    return () => clearInterval(interval);
+    // Change background periodically
+    const bgInterval = setInterval(() => {
+      setBackgroundIndex((prev) => (prev + 1) % naturalBackgrounds.length);
+    }, 120000);
+    
+    return () => {
+      clearInterval(interval);
+      clearInterval(bgInterval);
+    };
   }, []);
   
   useEffect(() => {
@@ -123,17 +133,19 @@ const PrayerTimes = () => {
   };
   
   const forbiddenTimes = getForbiddenPrayerTimes();
-  
-  // Calculate remaining time to prayer more accurately
-  const calculateRemainingTime = (prayer: any) => {
-    // This is a placeholder. In a real app, we would calculate this based on actual time
-    return "45:22"; // Example format
-  };
 
   return (
-    <div className="min-h-screen bg-black flex flex-col">
+    <div 
+      className="min-h-screen flex flex-col"
+      style={{
+        backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.8)), url(${naturalBackgrounds[backgroundIndex]})`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundAttachment: 'fixed'
+      }}
+    >
       {/* Header */}
-      <div className="bg-black text-white p-4 flex items-center">
+      <div className="bg-black/70 text-white p-4 flex items-center">
         <button onClick={() => navigate("/")} className="p-2 mr-2">
           <ChevronLeft className="w-5 h-5" />
         </button>
@@ -141,7 +153,7 @@ const PrayerTimes = () => {
       </div>
       
       {/* Islamic Date */}
-      <div className="bg-gray-900 px-4 py-3 flex justify-between items-center">
+      <div className="bg-gray-900/80 px-4 py-3 flex justify-between items-center">
         <div className="text-amber-400 font-arabic">
           <span className="text-xl">{islamicDate.day}</span>
           <span className="text-sm"> {islamicDate.month}</span>
@@ -157,7 +169,7 @@ const PrayerTimes = () => {
       </div>
       
       {/* Next Prayer Countdown */}
-      <div className="bg-gray-900/80 px-4 py-4 border-b border-gray-800">
+      <div className="bg-gray-900/90 px-4 py-4 border-b border-gray-800">
         <h3 className="text-amber-400 text-center font-arabic text-lg mb-1">
           {getNextPrayer()}
         </h3>
@@ -167,12 +179,12 @@ const PrayerTimes = () => {
       </div>
       
       {/* Prayer Times List with Notification Toggles */}
-      <div className="flex-1 bg-black">
+      <div className="flex-1 bg-black/60">
         {prayerTimes.slice(0, 6).map((prayer) => (
           <div 
             key={prayer.name}
-            className={`px-4 py-3 flex justify-between items-center border-b border-gray-800 ${
-              prayer.isNext ? 'bg-gray-900/30' : ''
+            className={`px-4 py-3 flex justify-between items-center border-b border-gray-800/60 ${
+              prayer.isNext ? 'bg-gray-900/60' : ''
             }`}
           >
             <div className="flex items-center">
@@ -197,11 +209,11 @@ const PrayerTimes = () => {
       </div>
       
       {/* Forbidden Prayer Times */}
-      <div className="bg-gray-900/40 p-4">
+      <div className="bg-gray-900/80 p-4">
         <h3 className="text-red-500 font-arabic text-lg mb-2">أوقات النهي عن الصلاة</h3>
         
         {forbiddenTimes.map((time, index) => (
-          <div key={index} className="mb-3 bg-red-900/10 p-3 rounded-md">
+          <div key={index} className="mb-3 bg-red-900/30 p-3 rounded-md">
             <p className="font-arabic text-white">{time.description}</p>
             <p className="text-sm text-gray-400">{time.timeRange}</p>
           </div>
@@ -209,23 +221,23 @@ const PrayerTimes = () => {
       </div>
       
       {/* Buttons for Rawatib and Duha */}
-      <div className="grid grid-cols-2 gap-2 p-2 bg-black">
+      <div className="grid grid-cols-2 gap-2 p-2 bg-black/80">
         <button
           onClick={() => navigate("/sunnah-prayers")}
-          className="p-4 bg-gray-900/50 rounded-lg text-center"
+          className="p-4 bg-gray-900/70 rounded-lg text-center"
         >
           <span className="text-lg font-arabic text-white">السنن الرواتب</span>
         </button>
         <button
           onClick={() => navigate("/duha-prayer")}
-          className="p-4 bg-gray-900/50 rounded-lg text-center"
+          className="p-4 bg-gray-900/70 rounded-lg text-center"
         >
           <span className="text-lg font-arabic text-white">صلاة الضحى</span>
         </button>
       </div>
       
       {/* Notification Permission Button */}
-      <div className="p-4 bg-black">
+      <div className="p-4 bg-black/80">
         <button
           onClick={requestNotificationPermission}
           className="w-full p-3 bg-islamic-green-dark rounded-lg font-arabic text-white"

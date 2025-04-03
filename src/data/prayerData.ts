@@ -1,3 +1,4 @@
+
 export interface PrayerTime {
   name: string;
   time: string;
@@ -31,7 +32,9 @@ const toArabicNumerals = (num: number): string => {
 const formatArabicTime = (hour: number, minute: number): string => {
   const period = hour < 12 ? 'ص' : 'م';
   const h = hour % 12 || 12;
-  return `${period} ${toArabicNumerals(h)}:${toArabicNumerals(minute)}`;
+  // Ensure minutes are padded with leading zero if needed
+  const formattedMinute = minute < 10 ? `٠${toArabicNumerals(minute)}` : toArabicNumerals(minute);
+  return `${period} ${toArabicNumerals(h)}:${formattedMinute}`;
 };
 
 export const getCurrentIslamicDate = (): IslamicDate => {
@@ -49,13 +52,13 @@ export const getCurrentIslamicDate = (): IslamicDate => {
 
 export const getPrayerTimes = (latitude: number = 21.3891, longitude: number = 39.8579): PrayerTime[] => {
   // In a real app, this would use a prayer time calculation library or API
-  // For now, we'll use more realistic fixed times as a placeholder
+  // For now, we'll use more realistic fixed times
   
   const now = new Date();
   const currentHour = now.getHours();
   const currentMinute = now.getMinutes();
   
-  // Create times based on current time for demo purposes
+  // Create more realistic prayer times
   const fajrHour = 4;
   const fajrMinute = 11;
   
@@ -198,6 +201,6 @@ export const getTimeToNextPrayer = (): string => {
   const hours = Math.floor(diffMinutes / 60);
   const minutes = diffMinutes % 60;
   
-  // Convert to Arabic numerals
-  return `${toArabicNumerals(minutes)} : ${toArabicNumerals(hours)}`;
+  // Convert to Arabic numerals with proper formatting
+  return `${toArabicNumerals(hours)}:${toArabicNumerals(minutes)}`;
 };
