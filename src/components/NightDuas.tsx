@@ -1,93 +1,105 @@
 
-import React from "react";
-import { Heart } from "lucide-react";
+import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAppSettings } from "../contexts/AppSettingsContext";
+import { Moon, ChevronRight } from 'lucide-react';
 
 interface NightDua {
   id: string;
   arabic: string;
-  translation: string;
-  transliteration: string;
-  reference: string;
+  translation?: string;
+  reference?: string;
 }
 
-// Night duas for when one wakes up during the night
 const nightDuas: NightDua[] = [
   {
     id: "night-dua-1",
-    arabic: "لا إله إلا الله وحده لا شريك له، له الملك وله الحمد، وهو على كل شيء قدير، الحمد لله، وسبحان الله، ولا إله إلا الله، والله أكبر، ولا حول ولا قوة إلا بالله العلي العظيم، رب اغفر لي",
-    translation: "There is none worthy of worship but Allah alone, Who has no partner. His is the dominion and to Him belongs all praise, and He is able to do all things. Glory is to Allah. Praise is to Allah. There is none worthy of worship but Allah. Allah is the Most Great. There is no might and no power except by Allah's leave, the Exalted, the Mighty. My Lord, forgive me.",
-    transliteration: "Laa 'ilaaha 'illallaahu wahdahu laa shareeka lahu, lahul-mulku wa lahul-hamdu, wa Huwa 'alaa kulli shay'in Qadeer. Al-hamdu lillaahi, wa Subhaanallaahi, wa laa 'ilaaha 'illallaahu, wallaahu 'Akbar, wa laa hawla wa laa Quwwata 'illaa billaahil-'Aliyyil-'Adheem. Rabbigh-fir lee.",
-    reference: "صحيح البخاري"
+    arabic: "اللَّهُمَّ عَافِنِي فِي بَدَنِي، اللَّهُمَّ عَافِنِي فِي سَمْعِي، اللَّهُمَّ عَافِنِي فِي بَصَرِي، لَا إِلَهَ إِلَّا أَنْتَ.",
+    translation: "O Allah, grant me health in my body. O Allah, grant me health in my hearing. O Allah, grant me health in my sight. There is no deity except You.",
+    reference: "أبو داود والترمذي"
   },
   {
     id: "night-dua-2",
-    arabic: "اللهُمَّ لَكَ الْحَمْدُ أَنْتَ قَيِّمُ السَّمَوَاتِ وَالأَرْضِ وَمَنْ فِيهِنَّ، وَلَكَ الْحَمْدُ أَنْتَ نُورُ السَّمَوَاتِ وَالأَرْضِ وَمَنْ فِيهِنَّ",
-    translation: "O Allah! All praise is due to You. You are the Sustainer of the heavens and the Earth and whatever is in them. All praise is due to You. You are the Light of the heavens and the Earth and whatever is in them.",
-    transliteration: "Allaahumma lakal-hamdu 'Anta Qayyimus-samaawaati wal'ardhi wa man feehinna, wa lakal-hamdu 'Anta Noorus-samaawaati wal'ardhi wa man feehinna.",
-    reference: "صحيح البخاري"
+    arabic: "اللَّهُمَّ إِنِّي أَعُوذُ بِكَ مِنَ الْكُفْرِ وَالْفَقْرِ، اللَّهُمَّ إِنِّي أَعُوذُ بِكَ مِنْ عَذَابِ الْقَبْرِ، لَا إِلَهَ إِلَّا أَنْتَ.",
+    translation: "O Allah, I seek refuge in You from disbelief and poverty. O Allah, I seek refuge in You from the punishment of the grave. There is no deity except You.",
+    reference: "أبو داود والنسائي"
   },
   {
     id: "night-dua-3",
-    arabic: "الْحَمْدُ لِلَّهِ الَّذِي أَحْيَانَا بَعْدَ مَا أَمَاتَنَا وَإِلَيْهِ النُّشُورُ",
-    translation: "All praise is for Allah who gave us life after having taken it from us and unto Him is the resurrection.",
-    transliteration: "Alhamdu lillahil-lathee ahyana ba'da ma amatana wa'ilayhin-nushoor.",
-    reference: "صحيح البخاري"
+    arabic: "لا إلهَ إلاّ اللّهُ وَحْدَهُ لا شَريكَ لهُ، لهُ المُلْكُ ولهُ الحَمْدُ، وهُوَ على كلّ شيءٍ قديرٌ، سُبْحانَ اللّهِ، والحمْدُ للّهِ، ولا إلهَ إلاّ اللّهُ، واللّهُ أكبَرُ، وَلا حَوْلَ وَلا قُوَّةَ إِلاّ بِاللّهِ العليِّ العظيمِ، ربِّ اغْفِرْ لي.",
+    translation: "There is no deity except Allah, alone, with no partner. His is the dominion and His is the praise, and He is over all things competent. Glory is to Allah, and praise is to Allah, and there is no deity except Allah, and Allah is the greatest. And there is no might nor power except by Allah, the Most High, the Most Great. O Lord, forgive me.",
+    reference: "البخاري"
+  },
+  {
+    id: "night-dua-4",
+    arabic: "اللَّهُمَّ أَسْلَمْتُ نَفْسِي إِلَيْكَ، وَفَوَّضْتُ أَمْرِي إِلَيْكَ، وَوَجَّهْتُ وَجْهِيَ إِلَيْكَ، وَأَلْجَأْتُ ظَهْرِي إِلَيْكَ، رَغْبَةً وَرَهْبَةً إِلَيْكَ، لَا مَلْجَأَ وَلَا مَنْجَا مِنْكَ إِلَّا إِلَيْكَ، آمَنْتُ بِكِتَابِكَ الَّذِي أَنْزَلْتَ، وَبِنَبِيِّكَ الَّذِي أَرْسَلْتَ.",
+    translation: "O Allah, I submit myself to You, and entrust my affairs to You, and turn my face to You, and I put my complete trust in You, hoping in You and fearing You. There is no refuge and no escape from You except to You. I believe in Your Book which You have revealed, and Your Prophet whom You have sent.",
+    reference: "البخاري ومسلم"
+  },
+  {
+    id: "night-dua-5",
+    arabic: "بِاسْمِكَ اللَّهُمَّ أَمُوتُ وَأَحْيَا.",
+    translation: "In Your name, O Allah, I die and I live.",
+    reference: "البخاري"
   }
 ];
 
-interface NightDuasProps {
-  onAddToFavorites?: (duaId: string) => void;
-}
-
-const NightDuas: React.FC<NightDuasProps> = ({ onAddToFavorites }) => {
+export const NightDuas: React.FC = () => {
+  const navigate = useNavigate();
   const { settings } = useAppSettings();
-  const [currentDuaIndex, setCurrentDuaIndex] = React.useState(0);
+  const isArabic = settings.language === "ar";
   
-  // Rotate through the duas automatically
-  React.useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentDuaIndex((prev) => (prev + 1) % nightDuas.length);
-    }, 30000); // Change every 30 seconds
-    
-    return () => clearInterval(interval);
-  }, []);
+  const getRandomDua = (): NightDua => {
+    const randomIndex = Math.floor(Math.random() * nightDuas.length);
+    return nightDuas[randomIndex];
+  };
   
-  const currentDua = nightDuas[currentDuaIndex];
+  const [currentDua, setCurrentDua] = React.useState<NightDua>(getRandomDua());
+  
+  const changeDua = () => {
+    let newDua = getRandomDua();
+    // Make sure we don't get the same dua twice in a row
+    while (newDua.id === currentDua.id) {
+      newDua = getRandomDua();
+    }
+    setCurrentDua(newDua);
+  };
   
   return (
-    <div className="rounded-lg p-4 overflow-hidden border border-violet-800/30 bg-gradient-to-r from-violet-900/20 to-violet-800/5">
-      <div className="flex justify-between items-start mb-2">
-        <p className="text-violet-400 text-lg font-arabic text-center">
-          {settings.language === "ar" ? "دعاء من تعار من الليل" : "Dua for waking up at night"}
-        </p>
+    <div className="relative min-h-[200px] bg-gradient-to-br from-slate-900 to-indigo-900 border border-indigo-800/30 p-4 rounded-xl overflow-hidden">
+      {/* Background decoration */}
+      <div className="absolute top-2 right-2 opacity-20">
+        <Moon className="w-12 h-12 text-indigo-300" />
+      </div>
+      
+      <div className="absolute top-3 left-3 flex items-center z-10">
+        <h3 className="text-lg font-arabic text-indigo-300">
+          {isArabic ? "دعاء من تعار من الليل" : "Night Duas"}
+        </h3>
+      </div>
+      
+      <div className="absolute bottom-3 right-3 z-10">
         <button 
-          onClick={() => onAddToFavorites?.(currentDua.id)}
-          className="p-1.5 bg-violet-900/30 rounded-full hover:bg-violet-800/50 transition-colors"
+          onClick={() => navigate("/category/night-duas")}
+          className="flex items-center text-xs text-indigo-300 hover:text-indigo-200"
         >
-          <Heart className="w-4 h-4 text-violet-400" />
+          {isArabic ? "المزيد" : "More"}
+          <ChevronRight className="w-4 h-4 rtl:rotate-180" />
         </button>
       </div>
       
-      <div className="mt-2 text-right space-y-3">
-        <p className="text-white font-arabic text-base leading-relaxed">
-          {currentDua.arabic}
-        </p>
-        
-        {settings.language === "en" && (
-          <>
-            <p className="text-white/70 text-sm italic">
-              {currentDua.transliteration}
+      <div className="flex justify-center items-center mt-12 mb-12">
+        <div onClick={changeDua} className="max-w-sm">
+          <p className="text-center font-arabic text-white text-base leading-loose">
+            {currentDua.arabic}
+          </p>
+          
+          {currentDua.reference && (
+            <p className="text-center text-xs text-indigo-300 mt-2">
+              {currentDua.reference}
             </p>
-            <p className="text-white/80 text-sm">
-              {currentDua.translation}
-            </p>
-          </>
-        )}
-        
-        <p className="text-violet-400/80 text-xs text-left mt-2">
-          {currentDua.reference}
-        </p>
+          )}
+        </div>
       </div>
     </div>
   );

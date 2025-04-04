@@ -4,12 +4,14 @@ import { useParams, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { azkarItems, azkarCategories } from "../data/azkarData";
 import { useToast } from "@/hooks/use-toast";
-import { ChevronLeft, ChevronRight, List, Share } from "lucide-react";
+import { ChevronLeft, ChevronRight, List, Share, Heart } from "lucide-react";
+import { useAppSettings } from "../contexts/AppSettingsContext";
 
 const AzkarList = () => {
   const { categoryId } = useParams<{ categoryId: string }>();
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { settings } = useAppSettings();
   
   // Find the current category
   const category = azkarCategories.find(cat => cat.id === categoryId);
@@ -31,6 +33,10 @@ const AzkarList = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [counter, setCounter] = useState(categoryAzkar[0]?.count || 0);
   const [completed, setCompleted] = useState<number[]>([]);
+  const [favorites, setFavorites] = useState<string[]>(() => {
+    const savedFavorites = localStorage.getItem("azkar-favorites");
+    return savedFavorites ? JSON.parse(savedFavorites) : [];
+  });
   
   useEffect(() => {
     // Reset counter when azkar changes
@@ -38,6 +44,11 @@ const AzkarList = () => {
       setCounter(categoryAzkar[currentIndex].count);
     }
   }, [currentIndex, categoryId]);
+  
+  useEffect(() => {
+    // Save favorites to localStorage
+    localStorage.setItem("azkar-favorites", JSON.stringify(favorites));
+  }, [favorites]);
   
   if (!category || categoryAzkar.length === 0) {
     return (
@@ -61,6 +72,7 @@ const AzkarList = () => {
   }
   
   const currentAzkar = categoryAzkar[currentIndex];
+  const isCurrentFavorite = favorites.includes(currentAzkar.id);
   
   const decrementCounter = () => {
     if (counter > 0) {
@@ -70,8 +82,10 @@ const AzkarList = () => {
       if (newCount === 0) {
         setCompleted([...completed, currentIndex]);
         toast({
-          title: "أحسنت!",
-          description: "تم الانتهاء من هذا الذكر",
+          title: settings.language === "ar" ? "أحسنت!" : "Well done!",
+          description: settings.language === "ar" 
+            ? "تم الانتهاء من هذا الذكر" 
+            : "You have completed this dhikr",
         });
         
         // Auto advance to next azkar after a brief delay
@@ -93,6 +107,42 @@ const AzkarList = () => {
   const goToPrevious = () => {
     if (currentIndex > 0) {
       setCurrentIndex(currentIndex - 1);
+    }
+  };
+  
+  const toggleFavorite = () => {
+    if (isCurrentFavorite) {
+      setFavorites(favorites.filter(id => id !== currentAzkar.id));
+      toast({
+        title: settings.language === "ar" ? "تمت الإزالة من المفضلة" : "Removed from favorites",
+        description: "",
+      });
+    } else {
+      setFavorites([...favorites, currentAzkar.id]);
+      toast({
+        title: settings.language === "ar" ? "تمت الإضافة للمفضلة" : "Added to favorites",
+        description: "",
+      });
+    }
+  };
+  
+  const shareAzkar = () => {
+    if (navigator.share) {
+      navigator.share({
+        title: category.name,
+        text: currentAzkar.arabic,
+        url: window.location.href
+      }).catch(err => console.error("Error sharing:", err));
+    } else {
+      // Fallback for browsers that don't support Web Share API
+      navigator.clipboard.writeText(currentAzkar.arabic).then(() => {
+        toast({
+          title: settings.language === "ar" ? "تم النسخ" : "Copied to clipboard",
+          description: settings.language === "ar" 
+            ? "تم نسخ الذكر إلى الحافظة"
+            : "Dhikr was copied to clipboard",
+        });
+      });
     }
   };
   
@@ -156,19 +206,15 @@ const AzkarList = () => {
           </span>
           
           <div className="flex space-x-4 rtl:space-x-reverse">
-            <button className="text-white">
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
-              </svg>
+            <button 
+              onClick={toggleFavorite}
+              className="text-white"
+            >
+              <Heart className={`h-6 w-6 ${isCurrentFavorite ? 'fill-red-500 text-red-500' : 'text-white'}`} />
             </button>
             
             <button 
-              onClick={() => {
-                toast({
-                  title: "مشاركة",
-                  description: "سيتم إضافة ميزة المشاركة قريبًا إن شاء الله",
-                });
-              }}
+              onClick={shareAzkar}
               className="text-white"
             >
               <Share className="h-6 w-6" />

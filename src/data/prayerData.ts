@@ -11,6 +11,7 @@ export interface IslamicDate {
   day: string;
   month: string;
   year: string;
+  dayOfWeek: string;
   gregorianDate: string;
 }
 
@@ -47,19 +48,28 @@ const formatEnglishTime = (hour: number, minute: number): string => {
   const h = hour % 12 || 12;
   // Ensure minutes are padded with leading zero if needed
   const formattedMinute = minute < 10 ? `0${minute}` : minute.toString();
-  return `${period} ${h}:${formattedMinute}`;
+  return `${h}:${formattedMinute} ${period}`;
 };
 
 export const getCurrentIslamicDate = (): IslamicDate => {
   // In a real app, this would use a proper Hijri calendar library
   const today = new Date();
+  const dayNames = {
+    ar: ["الأحد", "الإثنين", "الثلاثاء", "الأربعاء", "الخميس", "الجمعة", "السبت"],
+    en: ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
+  };
   
-  // This is just a placeholder value for demo purposes
+  // Get the current day of the week (0 = Sunday, 1 = Monday, etc.)
+  const dayIndex = today.getDay();
+  
+  // Current Hijri date - this is a placeholder
+  // In a real app, you would use a proper Hijri calendar conversion library
   return {
-    day: "٥",
+    day: "٦",
     month: "شوّال",
     year: "١٤٤٦", 
-    gregorianDate: today.toLocaleDateString('ar-SA')
+    dayOfWeek: dayNames.ar[dayIndex],
+    gregorianDate: format(today, 'dd/MM/yyyy')
   };
 };
 
@@ -178,23 +188,24 @@ export const getForbiddenPrayerTimes = (): ForbiddenPrayerTime[] => {
   ];
 };
 
-export const getTimeToNextPrayer = (language: string = 'ar'): string => {
+export const getTimeToNextPrayer = (language: string = 'ar', includeSeconds: boolean = true): string => {
   const prayerTimes = getPrayerTimes(undefined, undefined, language);
   const nextPrayer = prayerTimes.find(prayer => prayer.isNext);
   
   if (!nextPrayer) {
-    return language === 'ar' ? "٠٠:٠٠" : "00:00";
+    return language === 'ar' ? "٠٠:٠٠:٠٠" : "00:00:00";
   }
   
   // Parse the prayer time
-  let hourStr, minuteStr, period;
-  let prayerTimeStr = nextPrayer.time;
+  const now = new Date();
+  let hour = 0, minute = 0, period = '';
   
   if (language === 'ar') {
+    const prayerTimeStr = nextPrayer.time;
     const timeParts = prayerTimeStr.split(' ');
     period = timeParts[0];
     const timePortion = timeParts[1];
-    [hourStr, minuteStr] = timePortion.split(':');
+    const [hourStr, minuteStr] = timePortion.split(':');
     
     // Convert Arabic numerals to standard numerals
     const arabicToEnglish = (str: string) => {
@@ -211,17 +222,17 @@ export const getTimeToNextPrayer = (language: string = 'ar'): string => {
         .replace(/[٩]/g, '9');
     };
     
-    hourStr = arabicToEnglish(hourStr);
-    minuteStr = arabicToEnglish(minuteStr);
+    hour = parseInt(arabicToEnglish(hourStr));
+    minute = parseInt(arabicToEnglish(minuteStr));
   } else {
-    const timeParts = prayerTimeStr.split(' ');
-    period = timeParts[0];
-    const timePortion = timeParts[1];
-    [hourStr, minuteStr] = timePortion.split(':');
+    const prayerTimeStr = nextPrayer.time;
+    const [timePortion, periodPart] = prayerTimeStr.split(' ');
+    period = periodPart;
+    const [hourStr, minuteStr] = timePortion.split(':');
+    
+    hour = parseInt(hourStr);
+    minute = parseInt(minuteStr);
   }
-  
-  let hour = parseInt(hourStr);
-  const minute = parseInt(minuteStr);
   
   // Adjust for AM/PM (ص/م)
   if ((period === 'م' || period === 'PM') && hour !== 12) {
@@ -231,7 +242,6 @@ export const getTimeToNextPrayer = (language: string = 'ar'): string => {
   }
   
   // Calculate difference from now
-  const now = new Date();
   const prayerTime = new Date();
   prayerTime.setHours(hour, minute, 0, 0);
   
@@ -240,20 +250,26 @@ export const getTimeToNextPrayer = (language: string = 'ar'): string => {
     prayerTime.setDate(prayerTime.getDate() + 1);
   }
   
-  // Calculate difference in minutes
+  // Calculate difference in milliseconds
   const diffMs = prayerTime.getTime() - now.getTime();
-  const diffMinutes = Math.floor(diffMs / 60000);
-  
-  const hours = Math.floor(diffMinutes / 60);
-  const minutes = diffMinutes % 60;
+  const diffSeconds = Math.floor(diffMs / 1000);
+  const hours = Math.floor(diffSeconds / 3600);
+  const minutes = Math.floor((diffSeconds % 3600) / 60);
+  const seconds = diffSeconds % 60;
   
   // Convert to appropriate numerals with proper formatting
   if (language === 'ar') {
-    // Convert to Arabic numerals with proper formatting
-    return `${toArabicNumerals(hours)}:${minutes < 10 ? `٠${toArabicNumerals(minutes)}` : toArabicNumerals(minutes)}`;
+    if (includeSeconds) {
+      return `${toArabicNumerals(hours)}:${minutes < 10 ? `٠${toArabicNumerals(minutes)}` : toArabicNumerals(minutes)}:${seconds < 10 ? `٠${toArabicNumerals(seconds)}` : toArabicNumerals(seconds)}`;
+    } else {
+      return `${toArabicNumerals(hours)}:${minutes < 10 ? `٠${toArabicNumerals(minutes)}` : toArabicNumerals(minutes)}`;
+    }
   } else {
-    // Format with leading zeros for English
-    return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
+    if (includeSeconds) {
+      return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+    } else {
+      return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
+    }
   }
 };
 

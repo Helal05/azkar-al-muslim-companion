@@ -2,11 +2,12 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Bell, Clock, ChevronLeft, CalendarDays, AlertTriangle, MapPin, ChevronRight } from "lucide-react";
+import { Bell, Clock, ChevronLeft, CalendarDays, MapPin, ChevronRight } from "lucide-react";
 import { getCurrentIslamicDate, getPrayerTimes, getTimeToNextPrayer } from "../data/prayerData";
 import { useAppSettings } from "../contexts/AppSettingsContext";
 import { useTranslation } from "../utils/translations";
 import { useToast } from "@/hooks/use-toast";
+import { format } from "date-fns";
 
 const PrayerTimes = () => {
   const navigate = useNavigate();
@@ -15,9 +16,31 @@ const PrayerTimes = () => {
   const { toast } = useToast();
   
   const [islamicDate, setIslamicDate] = useState(getCurrentIslamicDate());
-  const [prayerTimes, setPrayerTimes] = useState(getPrayerTimes(settings.location.latitude, settings.location.longitude));
-  const [nextPrayerTime, setNextPrayerTime] = useState(getTimeToNextPrayer());
+  const [prayerTimes, setPrayerTimes] = useState(getPrayerTimes(settings.location.latitude, settings.location.longitude, settings.language));
+  const [nextPrayerTime, setNextPrayerTime] = useState(getTimeToNextPrayer(settings.language));
   const [showNotificationOptions, setShowNotificationOptions] = useState(false);
+  const [gregorianDate, setGregorianDate] = useState("");
+  const [dayOfWeek, setDayOfWeek] = useState("");
+
+  // Format current date
+  useEffect(() => {
+    const today = new Date();
+    const dayNames = {
+      ar: ["الأحد", "الإثنين", "الثلاثاء", "الأربعاء", "الخميس", "الجمعة", "السبت"],
+      en: ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
+    };
+    
+    setDayOfWeek(settings.language === "ar" ? dayNames.ar[today.getDay()] : dayNames.en[today.getDay()]);
+    
+    if (settings.language === "ar") {
+      const day = today.getDate().toString().padStart(2, '0');
+      const month = (today.getMonth() + 1).toString().padStart(2, '0');
+      const year = today.getFullYear();
+      setGregorianDate(`${day}/${month}/${year}`);
+    } else {
+      setGregorianDate(format(today, 'dd/MM/yyyy'));
+    }
+  }, [settings.language]);
 
   // Get next prayer name
   const getNextPrayer = () => {
@@ -27,17 +50,17 @@ const PrayerTimes = () => {
 
   // Update prayer times based on location
   useEffect(() => {
-    setPrayerTimes(getPrayerTimes(settings.location.latitude, settings.location.longitude));
-  }, [settings.location]);
+    setPrayerTimes(getPrayerTimes(settings.location.latitude, settings.location.longitude, settings.language));
+  }, [settings.location, settings.language]);
 
   // Update countdown timer
   useEffect(() => {
     const interval = setInterval(() => {
-      setNextPrayerTime(getTimeToNextPrayer());
-    }, 60000); // Update every minute
+      setNextPrayerTime(getTimeToNextPrayer(settings.language));
+    }, 1000); // Update every second for more accurate countdown
 
     return () => clearInterval(interval);
-  }, []);
+  }, [settings.language]);
 
   // Calculate elapsed time since last prayer or time until next prayer
   const getElapsedOrRemainingTime = () => {
@@ -166,7 +189,8 @@ const PrayerTimes = () => {
       <div className="bg-slate-800/50 p-3">
         <div className="flex justify-between items-center">
           <div className="text-left">
-            <p className="text-gray-300 text-sm">{islamicDate.gregorianDate}</p>
+            <p className="text-gray-300 text-sm">{gregorianDate}</p>
+            <p className="text-gray-300 text-xs">{dayOfWeek}</p>
           </div>
           <button 
             onClick={updateLocation}
@@ -179,13 +203,14 @@ const PrayerTimes = () => {
             <p className="text-gray-300 text-sm font-arabic">
               {islamicDate.day} {islamicDate.month}
             </p>
+            <p className="text-gray-300 text-xs font-arabic">{islamicDate.dayOfWeek}</p>
           </div>
         </div>
       </div>
       
       {/* Countdown to next prayer */}
       <div className="bg-slate-800/30 p-4 text-center">
-        <div className="mb-1 text-sm text-gray-400 font-arabic">{getNextPrayer()} {getElapsedOrRemainingTime()}</div>
+        <div className="mb-1 text-sm text-gray-400 font-arabic">{getNextPrayer()}</div>
         <div className="text-3xl font-bold text-amber-400 font-arabic">{nextPrayerTime}</div>
       </div>
       
@@ -223,7 +248,7 @@ const PrayerTimes = () => {
                     : t(prayer.name.toLowerCase() as any)}
                 </span>
                 {prayer.isNext && (
-                  <div className="flex items-center text-amber-500 text-sm mt-1">
+                  <div className="flex items-center justify-end text-amber-500 text-sm mt-1">
                     <Bell className="w-4 h-4 mr-1" />
                     <span className="font-arabic">{t('nextPrayer')}</span>
                   </div>
