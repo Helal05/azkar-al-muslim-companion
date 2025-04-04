@@ -1,3 +1,4 @@
+
 import { format } from 'date-fns';
 
 export interface PrayerTime {
@@ -187,10 +188,13 @@ export const getTimeToNextPrayer = (language: string = 'ar'): string => {
   
   // Parse the prayer time
   let hourStr, minuteStr, period;
+  let prayerTimeStr = nextPrayer.time;
   
   if (language === 'ar') {
-    [period, timeStr] = nextPrayer.time.split(' ');
-    [hourStr, minuteStr] = timeStr.split(':');
+    const timeParts = prayerTimeStr.split(' ');
+    period = timeParts[0];
+    const timePortion = timeParts[1];
+    [hourStr, minuteStr] = timePortion.split(':');
     
     // Convert Arabic numerals to standard numerals
     const arabicToEnglish = (str: string) => {
@@ -210,8 +214,10 @@ export const getTimeToNextPrayer = (language: string = 'ar'): string => {
     hourStr = arabicToEnglish(hourStr);
     minuteStr = arabicToEnglish(minuteStr);
   } else {
-    [period, timeStr] = nextPrayer.time.split(' ');
-    [hourStr, minuteStr] = timeStr.split(':');
+    const timeParts = prayerTimeStr.split(' ');
+    period = timeParts[0];
+    const timePortion = timeParts[1];
+    [hourStr, minuteStr] = timePortion.split(':');
   }
   
   let hour = parseInt(hourStr);
