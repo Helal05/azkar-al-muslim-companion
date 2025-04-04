@@ -125,7 +125,7 @@ const AzkarList = () => {
             onClick={decrementCounter}
           >
             <div className="arabic-text text-xl font-bold mb-6 flex-1 flex items-center justify-center text-white leading-loose">
-              {currentAzkar.text}
+              {currentAzkar.arabic}
             </div>
             
             {currentAzkar.benefit && (
