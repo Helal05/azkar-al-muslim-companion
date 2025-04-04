@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, useEffect, ReactNode } from "react";
 import { useToast } from "@/hooks/use-toast";
 
@@ -65,7 +64,6 @@ export const AppSettingsProvider: React.FC<{ children: ReactNode }> = ({ childre
   const { toast } = useToast();
   const [settings, setSettings] = useState<AppSettings>(defaultSettings);
   
-  // Load settings from localStorage on mount
   useEffect(() => {
     const savedSettings = localStorage.getItem("azkar-app-settings");
     if (savedSettings) {
@@ -73,14 +71,12 @@ export const AppSettingsProvider: React.FC<{ children: ReactNode }> = ({ childre
         const parsedSettings = JSON.parse(savedSettings);
         setSettings(parsedSettings);
         
-        // Apply dark mode setting
         if (parsedSettings.appearance.darkMode) {
           document.documentElement.classList.add("dark");
         } else {
           document.documentElement.classList.remove("dark");
         }
         
-        // Apply font size setting
         document.documentElement.style.fontSize = `${parsedSettings.appearance.fontSize}%`;
       } catch (error) {
         console.error("Error parsing saved settings:", error);
@@ -88,32 +84,32 @@ export const AppSettingsProvider: React.FC<{ children: ReactNode }> = ({ childre
     }
   }, []);
   
-  // Save settings to localStorage whenever they change
   useEffect(() => {
     localStorage.setItem("azkar-app-settings", JSON.stringify(settings));
   }, [settings]);
   
-  // Update entire settings object
   const updateSettings = (newSettings: Partial<AppSettings>) => {
     setSettings(prev => ({ ...prev, ...newSettings }));
   };
   
-  // Update location settings
   const updateLocationSettings = (locationData: Partial<AppSettings["location"]>) => {
-    setSettings(prev => ({
-      ...prev,
-      location: { ...prev.location, ...locationData }
-    }));
-    
-    toast({
-      title: settings.language === "ar" ? "تم تحديث الموقع" : "Location updated",
-      description: settings.language === "ar" 
-        ? `تم تغيير الموقع إلى ${locationData.city || prev.location.city}`
-        : `Location changed to ${locationData.city || prev.location.city}`
+    setSettings(prev => {
+      const updatedSettings = {
+        ...prev,
+        location: { ...prev.location, ...locationData }
+      };
+      
+      toast({
+        title: prev.language === "ar" ? "تم تحديث الموقع" : "Location updated",
+        description: prev.language === "ar" 
+          ? `تم تغيير الموقع إلى ${locationData.city || prev.location.city}`
+          : `Location changed to ${locationData.city || prev.location.city}`
+      });
+      
+      return updatedSettings;
     });
   };
   
-  // Update notification settings
   const updateNotificationSettings = (notificationData: Partial<AppSettings["notifications"]>) => {
     setSettings(prev => ({
       ...prev,
@@ -121,14 +117,12 @@ export const AppSettingsProvider: React.FC<{ children: ReactNode }> = ({ childre
     }));
   };
   
-  // Update appearance settings
   const updateAppearanceSettings = (appearanceData: Partial<AppSettings["appearance"]>) => {
     setSettings(prev => ({
       ...prev,
       appearance: { ...prev.appearance, ...appearanceData }
     }));
     
-    // Apply dark mode setting if it was changed
     if (appearanceData.darkMode !== undefined) {
       if (appearanceData.darkMode) {
         document.documentElement.classList.add("dark");
@@ -137,13 +131,11 @@ export const AppSettingsProvider: React.FC<{ children: ReactNode }> = ({ childre
       }
     }
     
-    // Apply font size setting if it was changed
     if (appearanceData.fontSize !== undefined) {
       document.documentElement.style.fontSize = `${appearanceData.fontSize}%`;
     }
   };
   
-  // Update language
   const updateLanguage = (language: "ar" | "en") => {
     setSettings(prev => ({ ...prev, language }));
     
@@ -155,7 +147,6 @@ export const AppSettingsProvider: React.FC<{ children: ReactNode }> = ({ childre
     });
   };
   
-  // Toggle dark mode
   const toggleDarkMode = () => {
     const newDarkMode = !settings.appearance.darkMode;
     updateAppearanceSettings({ darkMode: newDarkMode });
@@ -168,21 +159,18 @@ export const AppSettingsProvider: React.FC<{ children: ReactNode }> = ({ childre
     });
   };
   
-  // Increase font size
   const increaseFontSize = () => {
     if (settings.appearance.fontSize < 150) {
       updateAppearanceSettings({ fontSize: settings.appearance.fontSize + 10 });
     }
   };
   
-  // Decrease font size
   const decreaseFontSize = () => {
     if (settings.appearance.fontSize > 80) {
       updateAppearanceSettings({ fontSize: settings.appearance.fontSize - 10 });
     }
   };
   
-  // Request location permission
   const requestLocationPermission = async (): Promise<boolean> => {
     if (!navigator.geolocation) {
       toast({
@@ -230,7 +218,7 @@ export const AppSettingsProvider: React.FC<{ children: ReactNode }> = ({ childre
       toast({
         title: settings.language === "ar" ? "خطأ في تحديد الموقع" : "Location error",
         description: settings.language === "ar" 
-          ? "لم نتمكن من تحديد موقعك. يرجى السماح بالوصول إلى الموقع أو إدخال المدينة يدويًا."
+          ? "لم نتمكن من تحديد موقعك. يرجى السماح بالوصول إلى الموقع أو إ��خال المدينة يدويًا."
           : "We couldn't determine your location. Please allow location access or enter your city manually.",
         variant: "destructive"
       });
