@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Bell, Clock, ChevronLeft, CalendarDays, AlertTriangle, MapPin } from "lucide-react";
+import { Bell, Clock, ChevronLeft, CalendarDays, AlertTriangle, MapPin, ChevronRight } from "lucide-react";
 import { getCurrentIslamicDate, getPrayerTimes, getTimeToNextPrayer } from "../data/prayerData";
 import { useAppSettings } from "../contexts/AppSettingsContext";
 import { useTranslation } from "../utils/translations";
@@ -17,6 +17,7 @@ const PrayerTimes = () => {
   const [islamicDate, setIslamicDate] = useState(getCurrentIslamicDate());
   const [prayerTimes, setPrayerTimes] = useState(getPrayerTimes(settings.location.latitude, settings.location.longitude));
   const [nextPrayerTime, setNextPrayerTime] = useState(getTimeToNextPrayer());
+  const [showNotificationOptions, setShowNotificationOptions] = useState(false);
 
   // Get next prayer name
   const getNextPrayer = () => {
@@ -49,37 +50,62 @@ const PrayerTimes = () => {
 
   // Toggle prayer notifications
   const toggleNotifications = () => {
-    if (!settings.notifications.enabled) {
-      // Request permission
-      Notification.requestPermission().then(function(permission) {
-        if (permission === "granted") {
-          updateNotificationSettings({ enabled: true, prayerReminders: true });
-          
-          toast({
-            title: settings.language === "ar" ? "تم تفعيل الإشعارات" : "Notifications Enabled",
-            description: settings.language === "ar" 
-              ? "ستتلقى تنبيهات بأوقات الصلاة" 
-              : "You will receive prayer time alerts"
-          });
-          
-          // Show sample notification
-          new Notification(settings.language === "ar" ? "أذكاري" : "Azkari", {
-            body: settings.language === "ar" 
-              ? "تم تفعيل تنبيهات الصلاة" 
-              : "Prayer time alerts activated"
-          });
-        }
-      });
-    } else {
-      updateNotificationSettings({ prayerReminders: !settings.notifications.prayerReminders });
-      
+    setShowNotificationOptions(!showNotificationOptions);
+  };
+  
+  // Enable notifications with specific settings
+  const enableNotifications = (type: 'beforeAdhan' | 'atAdhan' | 'iqamah') => {
+    // Request permission
+    Notification.requestPermission().then(function(permission) {
+      if (permission === "granted") {
+        updateNotificationSettings({ 
+          enabled: true, 
+          prayerReminders: true,
+          reminderType: type 
+        });
+        
+        toast({
+          title: settings.language === "ar" ? "تم تفعيل الإشعارات" : "Notifications Enabled",
+          description: settings.language === "ar" 
+            ? "ستتلقى تنبيهات بأوقات الصلاة" 
+            : "You will receive prayer time alerts"
+        });
+        
+        // Show sample notification
+        new Notification(settings.language === "ar" ? "أذكاري" : "Azkari", {
+          body: settings.language === "ar" 
+            ? "تم تفعيل تنبيهات الصلاة" 
+            : "Prayer time alerts activated"
+        });
+        
+        setShowNotificationOptions(false);
+      }
+    });
+  };
+  
+  // Disable notifications
+  const disableNotifications = () => {
+    updateNotificationSettings({ prayerReminders: false });
+    
+    toast({
+      title: settings.language === "ar" ? "تم إيقاف الإشعارات" : "Notifications Disabled",
+      description: settings.language === "ar" 
+        ? "لن تتلقى تنبيهات بأوقات الصلاة" 
+        : "You won't receive prayer time alerts"
+    });
+    
+    setShowNotificationOptions(false);
+  };
+
+  // Update location
+  const updateLocation = async () => {
+    const success = await requestLocationPermission();
+    if (success) {
       toast({
-        title: settings.notifications.prayerReminders 
-          ? (settings.language === "ar" ? "تم إيقاف الإشعارات" : "Notifications Disabled")
-          : (settings.language === "ar" ? "تم تفعيل الإشعارات" : "Notifications Enabled"),
-        description: settings.notifications.prayerReminders
-          ? (settings.language === "ar" ? "لن تتلقى تنبيهات بأوقات الصلاة" : "You won't receive prayer time alerts")
-          : (settings.language === "ar" ? "ستتلقى تنبيهات بأوقات الصلاة" : "You will receive prayer time alerts")
+        title: settings.language === "ar" ? "تم تحديث الموقع" : "Location Updated",
+        description: settings.language === "ar" 
+          ? "تم تحديث موقعك ومواقيت الصلاة" 
+          : "Your location and prayer times have been updated"
       });
     }
   };
@@ -92,9 +118,48 @@ const PrayerTimes = () => {
           <ChevronLeft className="w-5 h-5 text-gray-300" />
         </button>
         <h2 className="text-xl font-arabic font-bold">{t('prayerTimes')}</h2>
-        <button onClick={toggleNotifications} className="p-2">
-          <Bell className={`w-5 h-5 ${settings.notifications.prayerReminders ? "text-amber-400" : "text-gray-300"}`} />
-        </button>
+        <div className="relative">
+          <button onClick={toggleNotifications} className="p-2">
+            <Bell className={`w-5 h-5 ${settings.notifications.prayerReminders ? "text-amber-400" : "text-gray-300"}`} />
+          </button>
+          
+          {/* Notification Options Dropdown */}
+          {showNotificationOptions && (
+            <div className="absolute top-full right-0 mt-2 z-50 w-64 bg-slate-800 border border-slate-700 rounded-lg shadow-lg">
+              <div className="p-3 border-b border-slate-700">
+                <h3 className="font-arabic text-amber-400">
+                  {settings.language === "ar" ? "إعدادات الإشعارات" : "Notification Settings"}
+                </h3>
+              </div>
+              <div className="p-2">
+                <button 
+                  onClick={() => enableNotifications('beforeAdhan')}
+                  className="w-full text-left p-2.5 hover:bg-slate-700 rounded-md transition-colors"
+                >
+                  {settings.language === "ar" ? "قبل الأذان" : "Before Adhan"}
+                </button>
+                <button 
+                  onClick={() => enableNotifications('atAdhan')}
+                  className="w-full text-left p-2.5 hover:bg-slate-700 rounded-md transition-colors"
+                >
+                  {settings.language === "ar" ? "عند الأذان" : "At Adhan Time"}
+                </button>
+                <button 
+                  onClick={() => enableNotifications('iqamah')}
+                  className="w-full text-left p-2.5 hover:bg-slate-700 rounded-md transition-colors"
+                >
+                  {settings.language === "ar" ? "عند الإقامة" : "At Iqamah Time"}
+                </button>
+                <button 
+                  onClick={disableNotifications}
+                  className="w-full text-left p-2.5 text-red-400 hover:bg-slate-700 rounded-md transition-colors mt-1"
+                >
+                  {settings.language === "ar" ? "إيقاف الإشعارات" : "Turn Off Notifications"}
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
       </div>
       
       {/* Islamic Date Display */}
@@ -103,10 +168,13 @@ const PrayerTimes = () => {
           <div className="text-left">
             <p className="text-gray-300 text-sm">{islamicDate.gregorianDate}</p>
           </div>
-          <div className="flex items-center text-center">
+          <button 
+            onClick={updateLocation}
+            className="flex items-center text-center hover:bg-slate-700/50 p-1.5 rounded-md transition-colors"
+          >
             <MapPin className="w-4 h-4 text-amber-400 mr-1.5" />
             <p className="text-amber-400 text-lg font-arabic">{settings.location.city}</p>
-          </div>
+          </button>
           <div className="text-right">
             <p className="text-gray-300 text-sm font-arabic">
               {islamicDate.day} {islamicDate.month}
@@ -193,14 +261,15 @@ const PrayerTimes = () => {
         <div className="mt-6">
           <button
             onClick={() => navigate("/monthly-prayer-times")}
-            className="flex items-center justify-center w-full bg-gradient-to-br from-slate-800/60 to-slate-800/20 p-4 rounded-lg border border-amber-800/30"
+            className="flex items-center justify-between w-full bg-gradient-to-br from-slate-800/60 to-slate-800/20 p-4 rounded-lg border border-amber-800/30"
           >
-            <CalendarDays className="w-5 h-5 text-amber-400 mr-2" />
+            <CalendarDays className="w-5 h-5 text-amber-400" />
             <span className="text-amber-400 font-arabic">
               {settings.language === "ar" 
                 ? "جدول مواقيت الصلاة الشهري" 
                 : "Monthly Prayer Times Calendar"}
             </span>
+            <ChevronRight className="w-5 h-5 text-amber-400" />
           </button>
         </div>
       </div>

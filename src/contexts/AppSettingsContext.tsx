@@ -1,3 +1,4 @@
+
 import React, { createContext, useContext, useState, useEffect, ReactNode } from "react";
 import { useToast } from "@/hooks/use-toast";
 
@@ -15,6 +16,8 @@ export interface AppSettings {
     prayerReminders: boolean;
     azkarReminders: boolean;
     reminderTime: number; // minutes before prayer
+    adhanSound: boolean;
+    reminderType: 'beforeAdhan' | 'atAdhan' | 'iqamah';
   };
   // Appearance settings
   appearance: {
@@ -49,7 +52,9 @@ const defaultSettings: AppSettings = {
     enabled: false,
     prayerReminders: true,
     azkarReminders: false,
-    reminderTime: 10
+    reminderTime: 10,
+    adhanSound: true,
+    reminderType: 'beforeAdhan'
   },
   appearance: {
     darkMode: true,
@@ -82,28 +87,70 @@ export const AppSettingsProvider: React.FC<{ children: ReactNode }> = ({ childre
         console.error("Error parsing saved settings:", error);
       }
     }
+    
+    // Try to get location on initial load
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const { latitude, longitude } = position.coords;
+          updateLocationSettings({
+            latitude,
+            longitude
+          });
+          
+          // Get city name from coordinates
+          getCityNameFromCoordinates(latitude, longitude);
+        },
+        (error) => {
+          console.log("Error getting location:", error);
+        }
+      );
+    }
   }, []);
   
   useEffect(() => {
     localStorage.setItem("azkar-app-settings", JSON.stringify(settings));
   }, [settings]);
   
+  // Function to get city name from coordinates using reverse geocoding
+  const getCityNameFromCoordinates = async (latitude: number, longitude: number) => {
+    try {
+      const response = await fetch(
+        `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&accept-language=${settings.language}`
+      );
+      const data = await response.json();
+      
+      if (data && data.address) {
+        const city = data.address.city || 
+                    data.address.town || 
+                    data.address.village || 
+                    data.address.county ||
+                    data.address.state ||
+                    "Unknown";
+        
+        updateLocationSettings({ city });
+      }
+    } catch (error) {
+      console.error("Error getting city name:", error);
+    }
+  };
+  
   const updateSettings = (newSettings: Partial<AppSettings>) => {
     setSettings(prev => ({ ...prev, ...newSettings }));
   };
   
   const updateLocationSettings = (locationData: Partial<AppSettings["location"]>) => {
-    setSettings(prev => {
+    setSettings(prevSettings => {
       const updatedSettings = {
-        ...prev,
-        location: { ...prev.location, ...locationData }
+        ...prevSettings,
+        location: { ...prevSettings.location, ...locationData }
       };
       
       toast({
-        title: prev.language === "ar" ? "تم تحديث الموقع" : "Location updated",
-        description: prev.language === "ar" 
-          ? `تم تغيير الموقع إلى ${locationData.city || prev.location.city}`
-          : `Location changed to ${locationData.city || prev.location.city}`
+        title: prevSettings.language === "ar" ? "تم تحديث الموقع" : "Location updated",
+        description: prevSettings.language === "ar" 
+          ? `تم تغيير الموقع إلى ${locationData.city || prevSettings.location.city}`
+          : `Location changed to ${locationData.city || prevSettings.location.city}`
       });
       
       return updatedSettings;
@@ -190,27 +237,54 @@ export const AppSettingsProvider: React.FC<{ children: ReactNode }> = ({ childre
       
       const { latitude, longitude } = position.coords;
       
+      // Update location coordinates immediately
+      updateLocationSettings({
+        latitude,
+        longitude
+      });
+      
+      // Get city name from coordinates
       try {
         const response = await fetch(
-          `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`
+          `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&accept-language=${settings.language}`
         );
         const data = await response.json();
         
-        const city = data.address?.city || data.address?.town || data.address?.village || "Unknown";
+        const city = data.address?.city || 
+                    data.address?.town || 
+                    data.address?.village || 
+                    data.address?.county ||
+                    data.address?.state ||
+                    "Unknown";
         
         updateLocationSettings({
-          city,
-          latitude,
-          longitude
+          city
+        });
+        
+        toast({
+          title: settings.language === "ar" ? "تم تحديد موقعك" : "Location detected",
+          description: settings.language === "ar" 
+            ? `تم تحديد موقعك: ${city}`
+            : `Your location: ${city}`
         });
         
         return true;
       } catch (error) {
         console.error("Error getting city name:", error);
+        
+        // Still update coordinates even if city name could not be obtained
         updateLocationSettings({
           latitude,
           longitude
         });
+        
+        toast({
+          title: settings.language === "ar" ? "تم تحديد موقعك" : "Location detected",
+          description: settings.language === "ar" 
+            ? "تم تحديد إحداثيات موقعك، لكن لم نتمكن من تحديد اسم المدينة."
+            : "Your location coordinates have been detected, but we couldn't determine the city name."
+        });
+        
         return true;
       }
     } catch (error) {
@@ -218,7 +292,7 @@ export const AppSettingsProvider: React.FC<{ children: ReactNode }> = ({ childre
       toast({
         title: settings.language === "ar" ? "خطأ في تحديد الموقع" : "Location error",
         description: settings.language === "ar" 
-          ? "لم نتمكن من تحديد موقعك. يرجى السماح بالوصول إلى الموقع أو إ��خال المدينة يدويًا."
+          ? "لم نتمكن من تحديد موقعك. يرجى السماح بالوصول إلى الموقع أو إدخال المدينة يدويًا."
           : "We couldn't determine your location. Please allow location access or enter your city manually.",
         variant: "destructive"
       });

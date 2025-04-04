@@ -4,29 +4,23 @@ import { useNavigate } from "react-router-dom";
 import { azkarCategories } from "../data/azkarData";
 import { quranVerses, naturalBackgrounds } from "../data/duaData";
 import { getCurrentIslamicDate, getPrayerTimes, getTimeToNextPrayer } from "../data/prayerData";
+import { useAppSettings } from "../contexts/AppSettingsContext";
 import { useToast } from "@/hooks/use-toast";
 import { Search, Heart, Bell, Settings, Moon, Sun, MapPin, Clock, Calendar } from "lucide-react";
+import NightDuas from "../components/NightDuas";
 
 const Index = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
-  const [darkMode, setDarkMode] = useState(() => {
-    return document.documentElement.classList.contains("dark");
-  });
+  const { settings, toggleDarkMode, requestLocationPermission } = useAppSettings();
+  
   const [currentVerse, setCurrentVerse] = useState(0);
   const [backgroundIndex, setBackgroundIndex] = useState(0);
   const [islamicDate, setIslamicDate] = useState(getCurrentIslamicDate());
-  const [prayerTimes, setPrayerTimes] = useState(getPrayerTimes());
+  const [prayerTimes, setPrayerTimes] = useState(getPrayerTimes(settings.location.latitude, settings.location.longitude));
   const [nextPrayerTime, setNextPrayerTime] = useState(getTimeToNextPrayer());
   const [searchQuery, setSearchQuery] = useState("");
   const [showSearch, setShowSearch] = useState(false);
-  
-  // Toggle dark mode
-  const toggleDarkMode = () => {
-    document.documentElement.classList.toggle("dark");
-    setDarkMode(!darkMode);
-    localStorage.setItem("theme", darkMode ? "light" : "dark");
-  };
 
   // Change Quranic verse and background periodically
   useEffect(() => {
@@ -52,16 +46,15 @@ const Index = () => {
 
   // Get user's location for accurate prayer times
   useEffect(() => {
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          const { latitude, longitude } = position.coords;
-          setPrayerTimes(getPrayerTimes(latitude, longitude));
-        },
-        (error) => {
-          console.log("Error getting location:", error);
-        }
-      );
+    setPrayerTimes(getPrayerTimes(settings.location.latitude, settings.location.longitude));
+  }, [settings.location]);
+  
+  // Auto request location on first load
+  useEffect(() => {
+    const hasRequestedLocation = localStorage.getItem("location-requested");
+    if (!hasRequestedLocation) {
+      requestLocationPermission();
+      localStorage.setItem("location-requested", "true");
     }
   }, []);
 
@@ -69,11 +62,8 @@ const Index = () => {
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     if (searchQuery.trim()) {
-      toast({
-        title: "جاري البحث...",
-        description: `البحث عن: ${searchQuery}`,
-      });
-      // In a real app, this would search through all azkar and duas
+      localStorage.setItem("search-query", searchQuery);
+      navigate(`/search?q=${encodeURIComponent(searchQuery)}`);
     }
   };
   
@@ -87,14 +77,18 @@ const Index = () => {
   const shareApp = () => {
     if (navigator.share) {
       navigator.share({
-        title: "تطبيق أذكاري",
-        text: "تطبيق للأذكار والأدعية الإسلامية",
+        title: settings.language === "ar" ? "تطبيق أذكاري" : "Azkari App",
+        text: settings.language === "ar" 
+          ? "تطبيق للأذكار والأدعية الإسلامية" 
+          : "Islamic app for Azkar and Duas",
         url: window.location.href
       }).catch(err => console.error("Error sharing:", err));
     } else {
       toast({
-        title: "المشاركة غير متاحة",
-        description: "متصفحك لا يدعم ميزة المشاركة"
+        title: settings.language === "ar" ? "المشاركة غير متاحة" : "Sharing not available",
+        description: settings.language === "ar" 
+          ? "متصفحك لا يدعم ميزة المشاركة" 
+          : "Your browser doesn't support the share feature"
       });
     }
   };
@@ -103,7 +97,7 @@ const Index = () => {
   const azkarMenuItems = [
     { 
       id: "morning", 
-      title: "أذكار الصباح", 
+      title: settings.language === "ar" ? "أذكار الصباح" : "Morning Azkar", 
       borderColor: "border-cyan-700",
       textColor: "text-cyan-500", 
       gradientFrom: "from-cyan-900/20", 
@@ -111,7 +105,7 @@ const Index = () => {
     },
     { 
       id: "evening", 
-      title: "أذكار المساء", 
+      title: settings.language === "ar" ? "أذكار المساء" : "Evening Azkar", 
       borderColor: "border-indigo-700",
       textColor: "text-indigo-500", 
       gradientFrom: "from-indigo-900/20", 
@@ -119,7 +113,7 @@ const Index = () => {
     },
     { 
       id: "afterPrayer", 
-      title: "أذكار بعد الصلاة", 
+      title: settings.language === "ar" ? "أذكار بعد الصلاة" : "After Prayer Azkar", 
       borderColor: "border-emerald-700",
       textColor: "text-emerald-500", 
       gradientFrom: "from-emerald-900/20", 
@@ -127,7 +121,7 @@ const Index = () => {
     },
     { 
       id: "sleep", 
-      title: "أذكار النوم", 
+      title: settings.language === "ar" ? "أذكار النوم" : "Sleep Azkar", 
       borderColor: "border-blue-700",
       textColor: "text-blue-500", 
       gradientFrom: "from-blue-900/20", 
@@ -135,7 +129,7 @@ const Index = () => {
     },
     { 
       id: "wakeup", 
-      title: "أذكار الاستيقاظ", 
+      title: settings.language === "ar" ? "أذكار الاستيقاظ" : "Wakeup Azkar", 
       borderColor: "border-teal-700",
       textColor: "text-teal-500", 
       gradientFrom: "from-teal-900/20", 
@@ -143,7 +137,7 @@ const Index = () => {
     },
     { 
       id: "quranDuas", 
-      title: "أدعية من القرآن", 
+      title: settings.language === "ar" ? "أدعية من القرآن" : "Duas from Quran", 
       borderColor: "border-amber-700",
       textColor: "text-amber-500", 
       gradientFrom: "from-amber-900/20", 
@@ -151,7 +145,7 @@ const Index = () => {
     },
     { 
       id: "prophet", 
-      title: "من دعاء الرسول ﷺ", 
+      title: settings.language === "ar" ? "من دعاء الرسول ﷺ" : "Prophet's Duas ﷺ", 
       borderColor: "border-purple-700",
       textColor: "text-purple-500", 
       gradientFrom: "from-purple-900/20", 
@@ -159,7 +153,7 @@ const Index = () => {
     },
     { 
       id: "names", 
-      title: "أسماء الله الحسنى", 
+      title: settings.language === "ar" ? "أسماء الله الحسنى" : "Allah's Names", 
       borderColor: "border-rose-700",
       textColor: "text-rose-500", 
       gradientFrom: "from-rose-900/20", 
@@ -167,7 +161,7 @@ const Index = () => {
     },
     { 
       id: "ruqyah", 
-      title: "الرقية بالقرآن", 
+      title: settings.language === "ar" ? "الرقية بالقرآن" : "Quran Ruqyah", 
       borderColor: "border-green-700",
       textColor: "text-green-500", 
       gradientFrom: "from-green-900/20", 
@@ -175,7 +169,7 @@ const Index = () => {
     },
     { 
       id: "ruqyahSunnah", 
-      title: "الرقية بالسنة", 
+      title: settings.language === "ar" ? "الرقية بالسنة" : "Sunnah Ruqyah", 
       borderColor: "border-emerald-700",
       textColor: "text-emerald-500", 
       gradientFrom: "from-emerald-900/20", 
@@ -183,7 +177,7 @@ const Index = () => {
     },
     { 
       id: "tasbih", 
-      title: "تسابيح", 
+      title: settings.language === "ar" ? "تسابيح" : "Tasbeeh",
       path: "/tasbih",
       borderColor: "border-sky-700",
       textColor: "text-sky-500", 
@@ -192,7 +186,7 @@ const Index = () => {
     },
     { 
       id: "more", 
-      title: "المزيد", 
+      title: settings.language === "ar" ? "المزيد" : "More", 
       path: "/more",
       borderColor: "border-gray-700",
       textColor: "text-gray-400", 
@@ -203,9 +197,20 @@ const Index = () => {
 
   // Get the next prayer that's highlighted
   const nextPrayer = prayerTimes.find(prayer => prayer.isNext);
+  
+  // Handle adding to favorites
+  const handleAddToFavorites = (duaId: string) => {
+    // In a real implementation, this would save to a favorites store
+    toast({
+      title: settings.language === "ar" ? "تمت الإضافة للمفضلة" : "Added to favorites",
+      description: settings.language === "ar" 
+        ? "تمت إضافة الدعاء إلى المفضلة"
+        : "This dua has been added to your favorites"
+    });
+  };
 
   return (
-    <div className="flex flex-col min-h-screen bg-gradient-to-b from-slate-900 to-slate-950">
+    <div className={`flex flex-col min-h-screen ${settings.appearance.darkMode ? "bg-gradient-to-b from-slate-900 to-slate-950 text-white" : "bg-gradient-to-b from-amber-50 to-amber-100 text-slate-900"}`}>
       {/* Header with Islamic pattern overlay and Quran verse */}
       <div 
         className="relative w-full text-white py-6 px-4 overflow-hidden"
@@ -238,7 +243,7 @@ const Index = () => {
               <Settings className="h-5 w-5 text-white/80 hover:text-white transition-colors" />
             </button>
             <button onClick={toggleDarkMode} className="p-1.5 rounded-full bg-white/10 backdrop-blur-sm">
-              {darkMode ? 
+              {settings.appearance.darkMode ? 
                 <Sun className="h-5 w-5 text-white/80 hover:text-white transition-colors" /> :
                 <Moon className="h-5 w-5 text-white/80 hover:text-white transition-colors" />
               }
@@ -254,7 +259,7 @@ const Index = () => {
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="ابحث ..."
+                placeholder={settings.language === "ar" ? "ابحث ..." : "Search..."}
                 className="w-full bg-white/10 backdrop-blur-md text-white rounded-lg py-2.5 px-4 font-arabic text-right border border-white/20 focus:outline-none focus:ring-2 focus:ring-white/30 focus:border-transparent"
               />
               <button
@@ -279,87 +284,104 @@ const Index = () => {
       </div>
 
       {/* Date & Prayer Time Info */}
-      <div className="bg-slate-800/80 border-t border-b border-white/10 backdrop-blur-md">
+      <div className={`${settings.appearance.darkMode ? "bg-slate-800/80" : "bg-white/80"} border-t border-b ${settings.appearance.darkMode ? "border-white/10" : "border-amber-200/50"} backdrop-blur-md`}>
         {/* Islamic Date Display */}
         <div className="flex items-center justify-between px-4 py-2.5">
           <div className="flex items-center text-xs text-white/70">
-            <Calendar className="h-3.5 w-3.5 ml-1 rtl:mr-1" />
-            <span>{islamicDate.gregorianDate}</span>
+            <Calendar className={`h-3.5 w-3.5 ml-1 rtl:mr-1 ${settings.appearance.darkMode ? "text-white/70" : "text-slate-600"}`} />
+            <span className={settings.appearance.darkMode ? "text-white/70" : "text-slate-600"}>{islamicDate.gregorianDate}</span>
           </div>
           
-          <div className="text-amber-400/90 text-sm font-arabic font-semibold">
+          <div className={`text-sm font-arabic font-semibold ${settings.appearance.darkMode ? "text-amber-400/90" : "text-amber-600"}`}>
             {islamicDate.day} {islamicDate.month} {islamicDate.year}هـ
           </div>
           
-          <div className="flex items-center text-xs text-white/70">
-            <MapPin className="h-3.5 w-3.5 ml-1 rtl:mr-1" />
-            <span>مكة المكرمة</span>
-          </div>
+          <button 
+            onClick={() => requestLocationPermission()}
+            className="flex items-center text-xs hover:bg-slate-700/20 p-1 rounded transition-colors"
+          >
+            <MapPin className={`h-3.5 w-3.5 ml-1 rtl:mr-1 ${settings.appearance.darkMode ? "text-white/70" : "text-slate-600"}`} />
+            <span className={settings.appearance.darkMode ? "text-white/70" : "text-slate-600"}>{settings.location.city}</span>
+          </button>
         </div>
         
         {/* Next Prayer Time */}
-        <div className="border-t border-white/5 px-4 py-3 flex justify-between items-center">
+        <div className={`border-t ${settings.appearance.darkMode ? "border-white/5" : "border-amber-200/30"} px-4 py-3 flex justify-between items-center`}>
           <div className="flex flex-col items-center">
-            <p className="text-white/70 text-xs mb-1">متبقي للصلاة</p>
+            <p className={`text-xs mb-1 ${settings.appearance.darkMode ? "text-white/70" : "text-slate-600"}`}>
+              {settings.language === "ar" ? "متبقي للصلاة" : "Time remaining"}
+            </p>
             <div className="flex items-center">
-              <Clock className="h-3.5 w-3.5 text-white/70 ml-1" />
-              <p className="text-white font-semibold">{nextPrayerTime}</p>
+              <Clock className={`h-3.5 w-3.5 ml-1 ${settings.appearance.darkMode ? "text-white/70" : "text-slate-600"}`} />
+              <p className={settings.appearance.darkMode ? "text-white font-semibold" : "text-slate-800 font-semibold"}>{nextPrayerTime}</p>
             </div>
           </div>
           
           <div className="flex flex-col items-center">
-            <p className="text-white/70 text-xs mb-1">الصلاة القادمة</p>
-            <p className="text-amber-400 font-arabic font-semibold">{nextPrayer?.name}</p>
+            <p className={`text-xs mb-1 ${settings.appearance.darkMode ? "text-white/70" : "text-slate-600"}`}>
+              {settings.language === "ar" ? "الصلاة القادمة" : "Next prayer"}
+            </p>
+            <p className={`font-arabic font-semibold ${settings.appearance.darkMode ? "text-amber-400" : "text-amber-600"}`}>{nextPrayer?.name}</p>
           </div>
           
           <div className="flex flex-col items-center">
-            <p className="text-white/70 text-xs mb-1">وقت الصلاة</p>
-            <p className="text-white font-semibold font-arabic">{nextPrayer?.time}</p>
+            <p className={`text-xs mb-1 ${settings.appearance.darkMode ? "text-white/70" : "text-slate-600"}`}>
+              {settings.language === "ar" ? "وقت الصلاة" : "Prayer time"}
+            </p>
+            <p className={`font-semibold font-arabic ${settings.appearance.darkMode ? "text-white" : "text-slate-800"}`}>{nextPrayer?.time}</p>
           </div>
         </div>
       </div>
 
       {/* Bottom Navigation */}
-      <div className="bg-slate-900/90 text-white py-2.5 flex justify-around border-b border-white/5 backdrop-blur-md">
+      <div className={`${settings.appearance.darkMode ? "bg-slate-900/90" : "bg-white/90"} py-2.5 flex justify-around border-b ${settings.appearance.darkMode ? "border-white/5" : "border-amber-200/30"} backdrop-blur-md`}>
         <button 
           onClick={() => navigate("/more")}
           className="flex flex-col items-center text-xs"
         >
-          <span className="text-gray-400 font-arabic">المنوعة</span>
+          <span className={`font-arabic ${settings.appearance.darkMode ? "text-gray-400" : "text-slate-600"}`}>
+            {settings.language === "ar" ? "المنوعة" : "Misc"}
+          </span>
         </button>
         <button 
           onClick={() => navigate("/favorites")}
           className="flex flex-col items-center text-xs"
         >
-          <span className="text-gray-400 font-arabic">المفضلة</span>
+          <span className={`font-arabic ${settings.appearance.darkMode ? "text-gray-400" : "text-slate-600"}`}>
+            {settings.language === "ar" ? "المفضلة" : "Favorites"}
+          </span>
         </button>
         <button 
           onClick={() => navigate("/qibla")}
           className="flex flex-col items-center text-xs"
         >
-          <span className="text-gray-400 font-arabic">القبلة</span>
+          <span className={`font-arabic ${settings.appearance.darkMode ? "text-gray-400" : "text-slate-600"}`}>
+            {settings.language === "ar" ? "القبلة" : "Qibla"}
+          </span>
         </button>
         <button 
           onClick={() => navigate("/prayer-times")}
           className="flex flex-col items-center text-xs"
         >
-          <span className="text-gray-400 font-arabic">الصلاة</span>
+          <span className={`font-arabic ${settings.appearance.darkMode ? "text-gray-400" : "text-slate-600"}`}>
+            {settings.language === "ar" ? "الصلاة" : "Prayer"}
+          </span>
         </button>
         <button 
           onClick={() => navigate("/tasbih")}
           className="flex flex-col items-center text-xs"
         >
-          <span className="text-gray-400 font-arabic">العداد</span>
+          <span className={`font-arabic ${settings.appearance.darkMode ? "text-gray-400" : "text-slate-600"}`}>
+            {settings.language === "ar" ? "العداد" : "Counter"}
+          </span>
         </button>
       </div>
 
       {/* Main Content - Categories Grid */}
       <div className="flex-1 py-5 px-3">
-        {/* Special Dua Card */}
-        <div 
-          className="mb-5 rounded-lg p-4 overflow-hidden border border-violet-800/30 bg-gradient-to-r from-violet-900/20 to-violet-800/5"
-        >
-          <p className="text-violet-400 text-xl font-arabic text-center">دعاء (من تعار من الليل)</p>
+        {/* Night Dua Card */}
+        <div className="mb-5">
+          <NightDuas onAddToFavorites={handleAddToFavorites} />
         </div>
         
         {/* Categories Grid */}
@@ -373,6 +395,22 @@ const Index = () => {
               <span className={`text-lg ${item.textColor} font-arabic`}>{item.title}</span>
             </button>
           ))}
+        </div>
+        
+        {/* Share App Button */}
+        <div className="mt-6">
+          <button
+            onClick={shareApp}
+            className={`flex items-center justify-center w-full py-3 px-4 rounded-lg ${
+              settings.appearance.darkMode 
+                ? "bg-gradient-to-br from-amber-900/20 to-amber-800/5 border border-amber-700/30" 
+                : "bg-gradient-to-br from-amber-500/20 to-amber-400/10 border border-amber-400/50"
+            }`}
+          >
+            <span className={`font-arabic ${settings.appearance.darkMode ? "text-amber-400" : "text-amber-600"}`}>
+              {settings.language === "ar" ? "مشاركة التطبيق" : "Share App"}
+            </span>
+          </button>
         </div>
       </div>
     </div>

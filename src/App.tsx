@@ -18,6 +18,8 @@ import More from "./pages/More";
 import DuaCategory from "./pages/DuaCategory";
 import Favorites from "./pages/Favorites";
 import ForbiddenPrayerTimes from "./pages/ForbiddenPrayerTimes";
+import MonthlyPrayerTimes from "./pages/MonthlyPrayerTimes";
+import Search from "./pages/Search";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -45,9 +47,11 @@ const App = () => (
             <Route path="/sunnah-prayers" element={<SunnahPrayers />} />
             <Route path="/duha-prayer" element={<DuhaPrayer />} />
             <Route path="/forbidden-times" element={<ForbiddenPrayerTimes />} />
+            <Route path="/monthly-prayer-times" element={<MonthlyPrayerTimes />} />
             <Route path="/more" element={<More />} />
             <Route path="/dua-category/:categoryId" element={<DuaCategory />} />
             <Route path="/favorites" element={<Favorites />} />
+            <Route path="/search" element={<Search />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>

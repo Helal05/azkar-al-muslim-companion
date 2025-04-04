@@ -61,7 +61,21 @@ type TranslationKey =
   | 'additionalOptions'
   | 'helpAndSupport'
   | 'importantNotes'
-  | 'nafilahProhibitedTimes';
+  | 'nafilahProhibitedTimes'
+  | 'search'
+  | 'searchResults'
+  | 'noResults'
+  | 'monthlyPrayerTimes'
+  | 'nightDuas'
+  | 'adhanNotifications'
+  | 'beforeAdhan'
+  | 'atAdhan'
+  | 'iqamah'
+  | 'turnOffNotifications'
+  | 'today'
+  | 'locationUpdateSuccessful'
+  | 'addedToFavorites'
+  | 'removedFromFavorites';
 
 export const translations: Record<"ar" | "en", Record<TranslationKey, string>> = {
   ar: {
@@ -126,7 +140,21 @@ export const translations: Record<"ar" | "en", Record<TranslationKey, string>> =
     additionalOptions: "خيارات إضافية",
     helpAndSupport: "المساعدة والدعم",
     importantNotes: "ملاحظات هامة",
-    nafilahProhibitedTimes: "أوقات لا تجوز فيها صلاة النافلة"
+    nafilahProhibitedTimes: "أوقات لا تجوز فيها صلاة النافلة",
+    search: "البحث",
+    searchResults: "نتائج البحث",
+    noResults: "لا توجد نتائج",
+    monthlyPrayerTimes: "جدول مواقيت الصلاة الشهري",
+    nightDuas: "دعاء من تعار من الليل",
+    adhanNotifications: "إشعارات الأذان",
+    beforeAdhan: "قبل الأذان",
+    atAdhan: "عند الأذان",
+    iqamah: "عند الإقامة",
+    turnOffNotifications: "إيقاف الإشعارات",
+    today: "اليوم",
+    locationUpdateSuccessful: "تم تحديث الموقع بنجاح",
+    addedToFavorites: "تمت الإضافة للمفضلة",
+    removedFromFavorites: "تمت الإزالة من المفضلة"
   },
   en: {
     appName: "Azkari",
@@ -190,7 +218,21 @@ export const translations: Record<"ar" | "en", Record<TranslationKey, string>> =
     additionalOptions: "Additional Options",
     helpAndSupport: "Help & Support",
     importantNotes: "Important Notes",
-    nafilahProhibitedTimes: "Times When Nafilah Prayers Are Prohibited"
+    nafilahProhibitedTimes: "Times When Nafilah Prayers Are Prohibited",
+    search: "Search",
+    searchResults: "Search Results",
+    noResults: "No Results",
+    monthlyPrayerTimes: "Monthly Prayer Times",
+    nightDuas: "Night Duas",
+    adhanNotifications: "Adhan Notifications",
+    beforeAdhan: "Before Adhan",
+    atAdhan: "At Adhan Time",
+    iqamah: "At Iqamah Time",
+    turnOffNotifications: "Turn Off Notifications",
+    today: "Today",
+    locationUpdateSuccessful: "Location updated successfully",
+    addedToFavorites: "Added to favorites",
+    removedFromFavorites: "Removed from favorites"
   }
 };
 
