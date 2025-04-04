@@ -15,6 +15,8 @@ export interface IslamicDate {
 export interface ForbiddenPrayerTime {
   description: string;
   timeRange: string;
+  descriptionEn?: string;
+  timeRangeEn?: string;
 }
 
 // Convert a JS Date to Arabic numeral string
@@ -133,16 +135,22 @@ export const getPrayerTimes = (latitude: number = 21.3891, longitude: number = 3
 export const getForbiddenPrayerTimes = (): ForbiddenPrayerTime[] => {
   return [
     {
-      description: "أوقات النهي عن الصلاة",
-      timeRange: "من بعد صلاة الفجر إلى بعد الشروق بثلث ساعة"
+      description: "من بعد صلاة الفجر إلى ارتفاع الشمس",
+      timeRange: "من بعد صلاة الفجر إلى بعد الشروق بثلث ساعة",
+      descriptionEn: "After Fajr prayer until the sun rises fully",
+      timeRangeEn: "From after Fajr prayer until about 15-20 minutes after sunrise"
     },
     {
       description: "عند قيام الشمس حتى تزول",
-      timeRange: "وقت استواء الشمس في منتصف السماء"
+      timeRange: "وقت استواء الشمس في منتصف السماء",
+      descriptionEn: "When the sun is at its zenith (midday)",
+      timeRangeEn: "When the sun is directly overhead until it begins to decline"
     },
     {
       description: "عندما تميل الشمس للغروب",
-      timeRange: "من بعد صلاة العصر إلى غروب الشمس"
+      timeRange: "من بعد صلاة العصر إلى غروب الشمس",
+      descriptionEn: "When the sun begins to set",
+      timeRangeEn: "From after Asr prayer until sunset"
     }
   ];
 };
@@ -202,5 +210,5 @@ export const getTimeToNextPrayer = (): string => {
   const minutes = diffMinutes % 60;
   
   // Convert to Arabic numerals with proper formatting
-  return `${toArabicNumerals(hours)}:${toArabicNumerals(minutes)}`;
+  return `${toArabicNumerals(hours)}:${minutes < 10 ? `٠${toArabicNumerals(minutes)}` : toArabicNumerals(minutes)}`;
 };
