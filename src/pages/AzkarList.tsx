@@ -236,13 +236,13 @@ const AzkarList = () => {
               <ChevronRight className="w-6 h-6" />
             </button>
             
-            {/* Counter Badge */}
+            {/* Counter Badge - Fixed the type issue by converting counter to string */}
             <button 
               onClick={decrementCounter}
               className="bg-gray-800 text-white px-3 py-1 rounded-full text-sm font-mono"
               aria-label="تسبيح"
             >
-              {counter}/{currentAzkar.count}
+              {counter.toString()}/{currentAzkar.count.toString()}
             </button>
             
             <button

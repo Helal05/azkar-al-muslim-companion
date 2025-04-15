@@ -1,3 +1,4 @@
+
 import { format, addDays } from 'date-fns';
 
 export interface PrayerTime {
@@ -182,8 +183,8 @@ export const getPrayerTimes = (latitude: number = 21.3891, longitude: number = 3
   let midnightMinute = Math.floor(midnightMinutes % 60);
   
   // Calculate last third of night (between midnight and fajr)
-  // Fix the error: midnight2minutes is not defined
-  const lastThirdStartMinutes = midnightMinutes + (fajrNextDayMinutes - midnightMinutes) * (2/3);
+  // Fix: Calculate lastThirdStartMinutes correctly using midnightMinutes
+  const lastThirdStartMinutes = midnightMinutes + ((fajrNextDayMinutes - midnightMinutes) * 2 / 3);
   
   let lastThirdHour = Math.floor(lastThirdStartMinutes / 60) % 24;
   let lastThirdMinute = Math.floor(lastThirdStartMinutes % 60);
