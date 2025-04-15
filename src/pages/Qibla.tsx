@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
@@ -179,73 +178,75 @@ const Qibla = () => {
       {/* Compass */}
       <div className="flex-1 flex flex-col items-center justify-center p-4">
         {qiblaDirection !== null ? (
-          <>
+          <div>
             {hasPermission ? (
-              <div className="relative w-64 h-64 mb-8">
-                <motion.div 
-                  className="w-full h-full"
-                  initial={{ rotate: 0 }}
-                  animate={{ rotate: -compassHeading }}
-                  transition={{ type: "spring", stiffness: 100 }}
-                >
-                  {/* Compass dial with cardinal directions */}
-                  <div className="absolute inset-0 rounded-full bg-gradient-to-b from-slate-800 to-slate-900 border-4 border-slate-700/50 shadow-lg">
-                    <div className="absolute w-1 h-8 bg-white top-0 left-1/2 -translate-x-1/2"></div>
-                    <div className="absolute w-1 h-8 bg-slate-600 bottom-0 left-1/2 -translate-x-1/2"></div>
-                    <div className="absolute h-1 w-8 bg-slate-600 left-0 top-1/2 -translate-y-1/2"></div>
-                    <div className="absolute h-1 w-8 bg-slate-600 right-0 top-1/2 -translate-y-1/2"></div>
-                    
-                    {/* Cardinal directions */}
-                    <div className="absolute top-8 left-1/2 -translate-x-1/2 text-white font-bold">N</div>
-                    <div className="absolute bottom-8 left-1/2 -translate-x-1/2 text-slate-400">S</div>
-                    <div className="absolute left-8 top-1/2 -translate-y-1/2 text-slate-400">W</div>
-                    <div className="absolute right-8 top-1/2 -translate-y-1/2 text-slate-400">E</div>
-                    
-                    {/* Qibla marker */}
-                    <div 
-                      className="absolute w-1 h-12 bg-amber-500 opacity-75"
-                      style={{ 
-                        transform: `rotate(${qiblaDirection}deg) translateY(-90px)`,
-                        transformOrigin: 'center 132px',
-                        left: 'calc(50% - 0.5px)'
-                      }}
-                    >
-                      <div className="w-5 h-5 bg-amber-500 rounded-full absolute -top-3 left-1/2 -translate-x-1/2"></div>
+              <>
+                <div className="relative w-64 h-64 mb-8">
+                  <motion.div 
+                    className="w-full h-full"
+                    initial={{ rotate: 0 }}
+                    animate={{ rotate: -compassHeading }}
+                    transition={{ type: "spring", stiffness: 100 }}
+                  >
+                    {/* Compass dial with cardinal directions */}
+                    <div className="absolute inset-0 rounded-full bg-gradient-to-b from-slate-800 to-slate-900 border-4 border-slate-700/50 shadow-lg">
+                      <div className="absolute w-1 h-8 bg-white top-0 left-1/2 -translate-x-1/2"></div>
+                      <div className="absolute w-1 h-8 bg-slate-600 bottom-0 left-1/2 -translate-x-1/2"></div>
+                      <div className="absolute h-1 w-8 bg-slate-600 left-0 top-1/2 -translate-y-1/2"></div>
+                      <div className="absolute h-1 w-8 bg-slate-600 right-0 top-1/2 -translate-y-1/2"></div>
+                      
+                      {/* Cardinal directions */}
+                      <div className="absolute top-8 left-1/2 -translate-x-1/2 text-white font-bold">N</div>
+                      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 text-slate-400">S</div>
+                      <div className="absolute left-8 top-1/2 -translate-y-1/2 text-slate-400">W</div>
+                      <div className="absolute right-8 top-1/2 -translate-y-1/2 text-slate-400">E</div>
+                      
+                      {/* Qibla marker */}
+                      <div 
+                        className="absolute w-1 h-12 bg-amber-500 opacity-75"
+                        style={{ 
+                          transform: `rotate(${qiblaDirection}deg) translateY(-90px)`,
+                          transformOrigin: 'center 132px',
+                          left: 'calc(50% - 0.5px)'
+                        }}
+                      >
+                        <div className="w-5 h-5 bg-amber-500 rounded-full absolute -top-3 left-1/2 -translate-x-1/2"></div>
+                      </div>
+                      
+                      {/* Center dot */}
+                      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-4 h-4 bg-slate-200 rounded-full"></div>
                     </div>
-                    
-                    {/* Center dot */}
-                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-4 h-4 bg-slate-200 rounded-full"></div>
-                  </div>
-                </motion.div>
-                
-                {/* Static Kaaba icon in center */}
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-10 w-16 h-16 flex items-center justify-center">
-                  <div className="w-14 h-14 bg-black rounded-md border-2 border-amber-600 flex items-center justify-center">
-                    <span className="text-amber-500 text-xs font-arabic">الكعبة</span>
+                  </motion.div>
+                  
+                  {/* Static Kaaba icon in center */}
+                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-10 w-16 h-16 flex items-center justify-center">
+                    <div className="w-14 h-14 bg-black rounded-md border-2 border-amber-600 flex items-center justify-center">
+                      <span className="text-amber-500 text-xs font-arabic">الكعبة</span>
+                    </div>
                   </div>
                 </div>
-              </div>
-              
-              <div className="text-center mb-4">
-                <p className="text-amber-400 font-arabic text-xl font-semibold">
-                  {settings.language === "ar" 
-                    ? `اتجاه القبلة: ${getDirectionName(qiblaDirection)}`
-                    : `Qibla: ${getDirectionName(qiblaDirection)}`}
-                </p>
-                <p className="text-white/60 font-arabic mt-2">
-                  {settings.language === "ar" 
-                    ? `${Math.round(qiblaDirection)}° من الشمال`
-                    : `${Math.round(qiblaDirection)}° from North`}
-                </p>
-              </div>
-              
-              <div className="text-center text-white/70">
-                <p className="text-sm font-arabic">
-                  {settings.language === "ar" 
-                    ? `اتجاه البوصلة: ${Math.round(compassHeading)}°`
-                    : `Compass heading: ${Math.round(compassHeading)}°`}
-                </p>
-              </div>
+                
+                <div className="text-center mb-4">
+                  <p className="text-amber-400 font-arabic text-xl font-semibold">
+                    {settings.language === "ar" 
+                      ? `اتجاه القبلة: ${getDirectionName(qiblaDirection)}`
+                      : `Qibla: ${getDirectionName(qiblaDirection)}`}
+                  </p>
+                  <p className="text-white/60 font-arabic mt-2">
+                    {settings.language === "ar" 
+                      ? `${Math.round(qiblaDirection)}° من الشمال`
+                      : `${Math.round(qiblaDirection)}° from North`}
+                  </p>
+                </div>
+                
+                <div className="text-center text-white/70">
+                  <p className="text-sm font-arabic">
+                    {settings.language === "ar" 
+                      ? `اتجاه البوصلة: ${Math.round(compassHeading)}°`
+                      : `Compass heading: ${Math.round(compassHeading)}°`}
+                  </p>
+                </div>
+              </>
             ) : (
               <div className="text-center">
                 <Compass className="w-24 h-24 mx-auto text-amber-400 mb-6" />
@@ -275,7 +276,7 @@ const Qibla = () => {
                 </p>
               </div>
             )}
-          </>
+          </div>
         ) : (
           <div className="text-center">
             <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-amber-500 mx-auto mb-6"></div>
