@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
@@ -13,10 +12,8 @@ const AzkarList = () => {
   const { toast } = useToast();
   const { settings } = useAppSettings();
   
-  // Find the current category
   const category = azkarCategories.find(cat => cat.id === categoryId);
   
-  // Special handling for Tasbih and Qibla
   if (categoryId === "tasbih") {
     navigate("/tasbih");
     return null;
@@ -27,7 +24,6 @@ const AzkarList = () => {
     return null;
   }
   
-  // Filter azkar by category
   const categoryAzkar = azkarItems.filter(item => item.category === categoryId);
   
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -39,14 +35,12 @@ const AzkarList = () => {
   });
   
   useEffect(() => {
-    // Reset counter when azkar changes
     if (categoryAzkar[currentIndex]) {
       setCounter(categoryAzkar[currentIndex].count);
     }
   }, [currentIndex, categoryId]);
   
   useEffect(() => {
-    // Save favorites to localStorage
     localStorage.setItem("azkar-favorites", JSON.stringify(favorites));
   }, [favorites]);
   
@@ -81,7 +75,8 @@ const AzkarList = () => {
       setCounter(newCount);
       
       if (newCount === 0) {
-        setCompleted([...completed, currentIndex]);
+        const indexAsNumber = Number(currentIndex);
+        setCompleted([...completed, indexAsNumber]);
         toast({
           title: settings.language === "ar" ? "أحسنت!" : "Well done!",
           description: settings.language === "ar" 
@@ -89,7 +84,6 @@ const AzkarList = () => {
             : "You have completed this dhikr",
         });
         
-        // Auto advance to next azkar after a brief delay
         if (currentIndex < categoryAzkar.length - 1) {
           setTimeout(() => {
             goToNext();
@@ -135,7 +129,6 @@ const AzkarList = () => {
         url: window.location.href
       }).catch(err => console.error("Error sharing:", err));
     } else {
-      // Fallback for browsers that don't support Web Share API
       navigator.clipboard.writeText(currentAzkar.arabic).then(() => {
         toast({
           title: settings.language === "ar" ? "تم النسخ" : "Copied to clipboard",
@@ -149,7 +142,6 @@ const AzkarList = () => {
   
   return (
     <div className="min-h-screen bg-black flex flex-col">
-      {/* Header */}
       <div className="bg-black text-white p-4 flex justify-between items-center">
         <button onClick={() => navigate("/")} className="p-2">
           <List className="w-5 h-5" />
@@ -162,7 +154,6 @@ const AzkarList = () => {
         </button>
       </div>
       
-      {/* Azkar Content */}
       <div className="flex-1 flex flex-col p-2">
         <motion.div 
           key={currentIndex}
@@ -200,10 +191,9 @@ const AzkarList = () => {
           </div>
         </motion.div>
         
-        {/* Bottom Navigation and Controls */}
         <div className="bg-gray-900 p-4 flex items-center justify-between border-t border-gray-800">
           <span className="text-white font-mono">
-            {currentIndex + 1}/{categoryAzkar.length}
+            {(currentIndex + 1).toString()}/{categoryAzkar.length.toString()}
           </span>
           
           <div className="flex space-x-4 rtl:space-x-reverse">
@@ -236,7 +226,6 @@ const AzkarList = () => {
               <ChevronRight className="w-6 h-6" />
             </button>
             
-            {/* Counter Badge - Fixed the type issue by converting counter to string */}
             <button 
               onClick={decrementCounter}
               className="bg-gray-800 text-white px-3 py-1 rounded-full text-sm font-mono"
