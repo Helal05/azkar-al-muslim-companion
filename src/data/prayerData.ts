@@ -16,6 +16,12 @@ interface IslamicDate {
   gregorianDate: string;
 }
 
+interface HijriDate {
+  day: number;
+  month: number;
+  year: number;
+}
+
 // Helper function to format time
 const formatTime = (date: Date): string => {
   return format(date, 'h:mm a');
@@ -126,7 +132,7 @@ export const getForbiddenPrayerTimes = () => {
   ];
 };
 
-export const calculateHijriDate = (date: Date = new Date()) => {
+export const calculateHijriDate = (date: Date = new Date()): HijriDate => {
   // Simplified Hijri date calculation
   const hijriMonths = [
     { name: "محرم", nameEn: "Muharram" },
@@ -134,11 +140,12 @@ export const calculateHijriDate = (date: Date = new Date()) => {
     // Add other months
   ];
 
-  const currentMonth = hijriMonths[date.getMonth()];
+  // For calculation purposes, determine the month number (1-12)
+  const monthNumber = date.getMonth() % 12 + 1;
 
   return {
     day: date.getDate(),
-    month: currentMonth.name,
+    month: monthNumber,
     year: date.getFullYear() - 578
   };
 };

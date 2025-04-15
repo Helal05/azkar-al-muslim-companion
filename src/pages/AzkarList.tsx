@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
@@ -193,7 +194,7 @@ const AzkarList = () => {
         
         <div className="bg-gray-900 p-4 flex items-center justify-between border-t border-gray-800">
           <span className="text-white font-mono">
-            {(currentIndex + 1).toString()}/{categoryAzkar.length.toString()}
+            {String(currentIndex + 1)}/{String(categoryAzkar.length)}
           </span>
           
           <div className="flex space-x-4 rtl:space-x-reverse">
@@ -231,7 +232,7 @@ const AzkarList = () => {
               className="bg-gray-800 text-white px-3 py-1 rounded-full text-sm font-mono"
               aria-label="تسبيح"
             >
-              {counter.toString()}/{currentAzkar.count.toString()}
+              {String(counter)}/{String(currentAzkar.count)}
             </button>
             
             <button

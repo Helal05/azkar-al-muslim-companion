@@ -51,8 +51,8 @@ const MonthlyPrayerTimes = () => {
   
   // Get current Hijri month based on calculated Hijri date
   const todayHijri = calculateHijriDate();
-  const [currentHijriMonth, setCurrentHijriMonth] = useState<number>(todayHijri.month);
-  const [currentHijriYear, setCurrentHijriYear] = useState<number>(todayHijri.year);
+  const [currentHijriMonth, setCurrentHijriMonth] = useState<number>(todayHijri.month as number);
+  const [currentHijriYear, setCurrentHijriYear] = useState<number>(todayHijri.year as number);
   
   // Arabic weekday names
   const weekdayNames = {
@@ -106,7 +106,7 @@ const MonthlyPrayerTimes = () => {
         : `${day.toString().padStart(2, '0')}/${(currentMonth + 1).toString().padStart(2, '0')}/${currentYear}`;
       
       const hijriDateDisplay = settings.language === "ar" 
-        ? `${toArabicNumerals(hijriDate.day)}/${toArabicNumerals(hijriDate.month)}/${toArabicNumerals(hijriDate.year)}`
+        ? `${toArabicNumerals(hijriDate.day as number)}/${toArabicNumerals(hijriDate.month as number)}/${toArabicNumerals(hijriDate.year as number)}`
         : `${hijriDate.day}/${hijriDate.month}/${hijriDate.year}`;
       
       daysList.push({
@@ -141,16 +141,16 @@ const MonthlyPrayerTimes = () => {
       // Calculate new Hijri date for previous month
       const prevDate = new Date(currentYear - 1, 11, 15);
       const prevHijri = calculateHijriDate(prevDate);
-      setCurrentHijriMonth(prevHijri.month);
-      setCurrentHijriYear(prevHijri.year);
+      setCurrentHijriMonth(Number(prevHijri.month));
+      setCurrentHijriYear(Number(prevHijri.year));
     } else {
       setCurrentMonth(currentMonth - 1);
       
       // Calculate new Hijri date for previous month
       const prevDate = new Date(currentYear, currentMonth - 1, 15);
       const prevHijri = calculateHijriDate(prevDate);
-      setCurrentHijriMonth(prevHijri.month);
-      setCurrentHijriYear(prevHijri.year);
+      setCurrentHijriMonth(Number(prevHijri.month));
+      setCurrentHijriYear(Number(prevHijri.year));
     }
   };
   
@@ -163,16 +163,16 @@ const MonthlyPrayerTimes = () => {
       // Calculate new Hijri date for next month
       const nextDate = new Date(currentYear + 1, 0, 15);
       const nextHijri = calculateHijriDate(nextDate);
-      setCurrentHijriMonth(nextHijri.month);
-      setCurrentHijriYear(nextHijri.year);
+      setCurrentHijriMonth(Number(nextHijri.month));
+      setCurrentHijriYear(Number(nextHijri.year));
     } else {
       setCurrentMonth(currentMonth + 1);
       
       // Calculate new Hijri date for next month
       const nextDate = new Date(currentYear, currentMonth + 1, 15);
       const nextHijri = calculateHijriDate(nextDate);
-      setCurrentHijriMonth(nextHijri.month);
-      setCurrentHijriYear(nextHijri.year);
+      setCurrentHijriMonth(Number(nextHijri.month));
+      setCurrentHijriYear(Number(nextHijri.year));
     }
   };
   
@@ -187,18 +187,18 @@ const MonthlyPrayerTimes = () => {
     const currentHijriDate = calculateHijriDate(today);
     
     // If selected month is ahead of current Hijri month
-    if (monthId > currentHijriDate.month) {
+    if (monthId > Number(currentHijriDate.month)) {
       // Go forward by the difference in months
-      const monthsAhead = monthId - currentHijriDate.month;
+      const monthsAhead = monthId - Number(currentHijriDate.month);
       const newDate = new Date();
       newDate.setMonth(newDate.getMonth() + monthsAhead);
       setCurrentMonth(newDate.getMonth());
       setCurrentYear(newDate.getFullYear());
     } 
     // If selected month is behind current Hijri month
-    else if (monthId < currentHijriDate.month) {
+    else if (monthId < Number(currentHijriDate.month)) {
       // Go backward by the difference in months
-      const monthsBehind = currentHijriDate.month - monthId;
+      const monthsBehind = Number(currentHijriDate.month) - monthId;
       const newDate = new Date();
       newDate.setMonth(newDate.getMonth() - monthsBehind);
       setCurrentMonth(newDate.getMonth());
