@@ -240,7 +240,6 @@ const Qibla = () => {
                     : `Compass heading: ${Math.round(compassHeading)}°`}
                 </p>
               </div>
-            </div>
             ) : (
               <div className="text-center">
                 <Compass className="w-24 h-24 mx-auto text-amber-400 mb-6" />
