@@ -6,8 +6,16 @@ import { quranVerses, naturalBackgrounds } from "../data/duaData";
 import { getCurrentIslamicDate, getPrayerTimes, getTimeToNextPrayer } from "../data/prayerData";
 import { useAppSettings } from "../contexts/AppSettingsContext";
 import { useToast } from "@/hooks/use-toast";
-import { Search, Heart, Bell, Settings, Moon, Sun, MapPin, Clock, Calendar } from "lucide-react";
-import NightDuas from "../components/NightDuas";
+import { Search, Heart, Settings, MapPin, Clock, Calendar } from "lucide-react";
+
+const islamicBackgrounds = [
+  "/patterns/islamic-pattern.svg",
+  "https://images.unsplash.com/photo-1542816417-0983c9c9ad53?q=80&w=1470&auto=format&fit=crop",
+  "https://images.unsplash.com/photo-1519817650390-64a93db51149?q=80&w=1470&auto=format&fit=crop",
+  "https://images.unsplash.com/photo-1619817724539-7eda2d359fdb?q=80&w=1471&auto=format&fit=crop",
+  "https://images.unsplash.com/photo-1507608869274-d3177c8bb4c7?q=80&w=1470&auto=format&fit=crop",
+  "https://images.unsplash.com/photo-1638903556115-2da9c323071c?q=80&w=1470&auto=format&fit=crop"
+];
 
 const Index = () => {
   const navigate = useNavigate();
@@ -16,9 +24,9 @@ const Index = () => {
   
   const [currentVerse, setCurrentVerse] = useState(0);
   const [backgroundIndex, setBackgroundIndex] = useState(0);
-  const [islamicDate, setIslamicDate] = useState(getCurrentIslamicDate());
-  const [prayerTimes, setPrayerTimes] = useState(getPrayerTimes(settings.location.latitude, settings.location.longitude));
-  const [nextPrayerTime, setNextPrayerTime] = useState(getTimeToNextPrayer());
+  const [islamicDate, setIslamicDate] = useState(getCurrentIslamicDate(settings.language));
+  const [prayerTimes, setPrayerTimes] = useState(getPrayerTimes(settings.location.latitude, settings.location.longitude, settings.language));
+  const [nextPrayerTime, setNextPrayerTime] = useState(getTimeToNextPrayer(settings.language, true));
   const [searchQuery, setSearchQuery] = useState("");
   const [showSearch, setShowSearch] = useState(false);
 
@@ -26,15 +34,16 @@ const Index = () => {
   useEffect(() => {
     const verseInterval = setInterval(() => {
       setCurrentVerse((prev) => (prev + 1) % quranVerses.length);
-    }, 60000); // Change verse every minute
+    }, 30000); // Change verse every 30 seconds
 
     const bgInterval = setInterval(() => {
-      setBackgroundIndex((prev) => (prev + 1) % naturalBackgrounds.length);
-    }, 120000); // Change background every 2 minutes
+      setBackgroundIndex((prev) => (prev + 1) % islamicBackgrounds.length);
+    }, 60000); // Change background every minute
 
-    // Update prayer times every minute
+    // Update prayer times and Islamic date every minute
     const timeInterval = setInterval(() => {
-      setNextPrayerTime(getTimeToNextPrayer());
+      setNextPrayerTime(getTimeToNextPrayer(settings.language, true));
+      setIslamicDate(getCurrentIslamicDate(settings.language));
     }, 60000);
 
     return () => {
@@ -42,12 +51,13 @@ const Index = () => {
       clearInterval(bgInterval);
       clearInterval(timeInterval);
     };
-  }, []);
+  }, [settings.language]);
 
-  // Get user's location for accurate prayer times
+  // Apply language changes and get user's location for accurate prayer times
   useEffect(() => {
-    setPrayerTimes(getPrayerTimes(settings.location.latitude, settings.location.longitude));
-  }, [settings.location]);
+    setPrayerTimes(getPrayerTimes(settings.location.latitude, settings.location.longitude, settings.language));
+    setIslamicDate(getCurrentIslamicDate(settings.language));
+  }, [settings.location, settings.language]);
   
   // Auto request location on first load
   useEffect(() => {
@@ -112,6 +122,14 @@ const Index = () => {
       gradientTo: "to-indigo-800/5" 
     },
     { 
+      id: "night-duas", 
+      title: settings.language === "ar" ? "أدعية الليل" : "Night Duas", 
+      borderColor: "border-violet-700",
+      textColor: "text-violet-500", 
+      gradientFrom: "from-violet-900/20", 
+      gradientTo: "to-violet-800/5" 
+    },
+    { 
       id: "afterPrayer", 
       title: settings.language === "ar" ? "أذكار بعد الصلاة" : "After Prayer Azkar", 
       borderColor: "border-emerald-700",
@@ -157,23 +175,16 @@ const Index = () => {
       borderColor: "border-rose-700",
       textColor: "text-rose-500", 
       gradientFrom: "from-rose-900/20", 
-      gradientTo: "to-rose-800/5" 
+      gradientTo: "to-rose-800/5",
+      path: "/names-of-allah"
     },
     { 
       id: "ruqyah", 
-      title: settings.language === "ar" ? "الرقية بالقرآن" : "Quran Ruqyah", 
+      title: settings.language === "ar" ? "الرقية الشرعية" : "Ruqyah", 
       borderColor: "border-green-700",
       textColor: "text-green-500", 
       gradientFrom: "from-green-900/20", 
       gradientTo: "to-green-800/5" 
-    },
-    { 
-      id: "ruqyahSunnah", 
-      title: settings.language === "ar" ? "الرقية بالسنة" : "Sunnah Ruqyah", 
-      borderColor: "border-emerald-700",
-      textColor: "text-emerald-500", 
-      gradientFrom: "from-emerald-900/20", 
-      gradientTo: "to-emerald-800/5" 
     },
     { 
       id: "tasbih", 
@@ -199,12 +210,12 @@ const Index = () => {
   const nextPrayer = prayerTimes.find(prayer => prayer.isNext);
 
   return (
-    <div className={`flex flex-col min-h-screen ${settings.appearance.darkMode ? "bg-gradient-to-b from-slate-900 to-slate-950 text-white" : "bg-gradient-to-b from-amber-50 to-amber-100 text-slate-900"}`}>
+    <div className="flex flex-col min-h-screen bg-gradient-to-b from-slate-900 to-slate-950 text-white">
       {/* Header with Islamic pattern overlay and Quran verse */}
       <div 
         className="relative w-full text-white py-6 px-4 overflow-hidden"
         style={{
-          backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url(${naturalBackgrounds[backgroundIndex]})`,
+          backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url(${islamicBackgrounds[backgroundIndex]})`,
           backgroundSize: 'cover',
           backgroundPosition: 'center'
         }}
@@ -267,7 +278,7 @@ const Index = () => {
       </div>
 
       {/* Date & Prayer Time Info */}
-      <div className={`${settings.appearance.darkMode ? "bg-slate-800/80" : "bg-slate-700/80"} border-t border-b ${settings.appearance.darkMode ? "border-white/10" : "border-amber-200/50"} backdrop-blur-md`}>
+      <div className="bg-slate-800/80 border-t border-b border-white/10 backdrop-blur-md">
         {/* Islamic Date Display */}
         <div className="flex items-center justify-between px-4 py-2.5">
           <div className="flex items-center text-xs text-white/70">
@@ -276,7 +287,8 @@ const Index = () => {
           </div>
           
           <div className="text-sm font-arabic font-semibold text-amber-400/90">
-            {islamicDate.day} {islamicDate.month} {islamicDate.year}هـ
+            {islamicDate.day} {islamicDate.month} {settings.language === "ar" ? "" : islamicDate.year}
+            {settings.language === "ar" ? "هـ" : "H"}
           </div>
           
           <button 
@@ -361,12 +373,7 @@ const Index = () => {
       </div>
 
       {/* Main Content - Categories Grid */}
-      <div className="flex-1 py-5 px-3">
-        {/* Night Dua Card */}
-        <div className="mb-5">
-          <NightDuas />
-        </div>
-        
+      <div className="flex-1 py-5 px-3 overflow-y-auto">
         {/* Categories Grid */}
         <div className="grid grid-cols-2 gap-3">
           {azkarMenuItems.map((item) => (

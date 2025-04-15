@@ -6,6 +6,7 @@ import { ChevronLeft, ChevronRight, Calendar, Moon, Sun, ChevronDown } from "luc
 import { useAppSettings } from "../contexts/AppSettingsContext";
 import { useTranslation } from "../utils/translations";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { calculateHijriDate, getPrayerTimesForDate } from "../data/prayerData";
 
 interface PrayerDay {
   date: string;
@@ -38,8 +39,8 @@ const MonthlyPrayerTimes = () => {
     { id: 2, name: "صفر", nameEn: "Safar" },
     { id: 3, name: "ربيع الأول", nameEn: "Rabi' al-Awwal" },
     { id: 4, name: "ربيع الثاني", nameEn: "Rabi' al-Thani" },
-    { id: 5, name: "جماد الأول", nameEn: "Jumada al-Awwal" },
-    { id: 6, name: "جماد الثاني", nameEn: "Jumada al-Thani" },
+    { id: 5, name: "جمادى الأولى", nameEn: "Jumada al-Ula" },
+    { id: 6, name: "جمادى الآخرة", nameEn: "Jumada al-Thani" },
     { id: 7, name: "رجب", nameEn: "Rajab" },
     { id: 8, name: "شعبان", nameEn: "Sha'ban" },
     { id: 9, name: "رمضان", nameEn: "Ramadan" },
@@ -48,9 +49,10 @@ const MonthlyPrayerTimes = () => {
     { id: 12, name: "ذو الحجة", nameEn: "Dhu al-Hijjah" }
   ];
   
-  // Get current Hijri month (this is a simplified approach - would need a proper Hijri calendar library in production)
-  const [currentHijriMonth, setCurrentHijriMonth] = useState<number>(10); // Default to Shawwal for demo
-  const [currentHijriYear, setCurrentHijriYear] = useState<number>(1446); // Current Hijri year
+  // Get current Hijri month based on calculated Hijri date
+  const todayHijri = calculateHijriDate();
+  const [currentHijriMonth, setCurrentHijriMonth] = useState<number>(todayHijri.month);
+  const [currentHijriYear, setCurrentHijriYear] = useState<number>(todayHijri.year);
   
   // Arabic weekday names
   const weekdayNames = {
@@ -58,9 +60,20 @@ const MonthlyPrayerTimes = () => {
     en: ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
   };
   
+  // Convert a number to Arabic numeral string
+  const toArabicNumerals = (num: number): string => {
+    const arabicNumerals = ['٠', '١', '٢', '٣', '٤', '٥', '٦', '٧', '٨', '٩'];
+    return num.toString().split('').map(digit => {
+      // Convert digit to number explicitly to ensure it's a number
+      const digitNum = parseInt(digit, 10);
+      // Check if it's a valid number before accessing the array
+      return !isNaN(digitNum) ? arabicNumerals[digitNum] : digit;
+    }).join('');
+  };
+  
   // Format time to display properly based on language
   const formatTime = (time: string) => {
-    return settings.language === "ar" ? time : time.replace(/[٠-٩]/g, d => String("0123456789".indexOf(d)));
+    return settings.language === "ar" ? time : time.replace(/[٠-٩]/g, d => String("0123456789"[["٠", "١", "٢", "٣", "٤", "٥", "٦", "٧", "٨", "٩"].indexOf(d)]));
   };
   
   // Generate prayer times for the month
@@ -76,64 +89,37 @@ const MonthlyPrayerTimes = () => {
       const date = new Date(currentYear, currentMonth, day);
       const weekdayIndex = date.getDay();
       
-      // This is a placeholder - in a real app, you would calculate the actual prayer times
-      // based on the location, date, and calculation method
-      const fajrHour = 4 + Math.floor(Math.random() * 2);
-      const fajrMinute = Math.floor(Math.random() * 30);
+      // Get accurate prayer times for this date and location
+      const prayerTimesForDay = getPrayerTimesForDate(
+        date, 
+        settings.location.latitude, 
+        settings.location.longitude, 
+        settings.language
+      );
       
-      const sunriseHour = 5 + Math.floor(Math.random() * 2);
-      const sunriseMinute = 30 + Math.floor(Math.random() * 30);
+      // Calculate Hijri date for this day
+      const hijriDate = calculateHijriDate(date);
       
-      const dhuhrHour = 11 + Math.floor(Math.random() * 2);
-      const dhuhrMinute = 45 + Math.floor(Math.random() * 15);
-      
-      const asrHour = 15 + Math.floor(Math.random() * 2);
-      const asrMinute = Math.floor(Math.random() * 30);
-      
-      const maghribHour = 18 + Math.floor(Math.random() * 2);
-      const maghribMinute = Math.floor(Math.random() * 30);
-      
-      const ishaHour = 19 + Math.floor(Math.random() * 2);
-      const ishaMinute = 30 + Math.floor(Math.random() * 30);
-      
-      // Convert date to strings with Arabic numerals for display
-      const toArabicNumerals = (num: number): string => {
-        if (settings.language !== "ar") return num.toString().padStart(2, '0');
-        const arabicNumerals = ['٠', '١', '٢', '٣', '٤', '٥', '٦', '٧', '٨', '٩'];
-        return num.toString().split('').map(digit => arabicNumerals[parseInt(digit)]).join('');
-      };
-      
-      // Format time for display
-      const formatTimeDisplay = (hour: number, minute: number): string => {
-        if (settings.language === "ar") {
-          return `${toArabicNumerals(hour)}:${toArabicNumerals(minute).padStart(2, '٠')}`;
-        } else {
-          return `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
-        }
-      };
-      
-      // Hijri date calculation (simplified - would need a proper library)
-      const hijriDay = (day + 3) % 30 || 30; // Simplified approach
-      const hijriDateDisplay = settings.language === "ar" 
-        ? `${toArabicNumerals(hijriDay)}/${toArabicNumerals(currentHijriMonth)}/${toArabicNumerals(currentHijriYear)}`
-        : `${hijriDay}/${currentHijriMonth}/${currentHijriYear}`;
-      
-      // Gregorian date display
+      // Format date strings
       const gregorianDateDisplay = settings.language === "ar"
         ? `${toArabicNumerals(day)}/${toArabicNumerals(currentMonth + 1)}/${toArabicNumerals(currentYear)}`
         : `${day.toString().padStart(2, '0')}/${(currentMonth + 1).toString().padStart(2, '0')}/${currentYear}`;
+      
+      const hijriDateDisplay = settings.language === "ar" 
+        ? `${toArabicNumerals(hijriDate.day)}/${toArabicNumerals(hijriDate.month)}/${toArabicNumerals(hijriDate.year)}`
+        : `${hijriDate.day}/${hijriDate.month}/${hijriDate.year}`;
       
       daysList.push({
         date: gregorianDateDisplay,
         hijriDate: hijriDateDisplay,
         weekday: settings.language === "ar" ? weekdayNames.ar[weekdayIndex] : weekdayNames.en[weekdayIndex],
         prayers: {
-          fajr: formatTimeDisplay(fajrHour, fajrMinute),
-          sunrise: formatTimeDisplay(sunriseHour, sunriseMinute),
-          dhuhr: formatTimeDisplay(dhuhrHour, dhuhrMinute),
-          asr: formatTimeDisplay(asrHour, asrMinute),
-          maghrib: formatTimeDisplay(maghribHour, maghribMinute),
-          isha: formatTimeDisplay(ishaHour, ishaMinute)
+          fajr: prayerTimesForDay[0].time,
+          sunrise: prayerTimesForDay[1].time,
+          dhuhr: prayerTimesForDay[2].time,
+          asr: prayerTimesForDay[3].time,
+          maghrib: prayerTimesForDay[4].time,
+          isha: prayerTimesForDay[5].time
         },
         isToday: isCurrentMonth && day === todayDate
       });
@@ -144,21 +130,27 @@ const MonthlyPrayerTimes = () => {
   
   useEffect(() => {
     generateMonthPrayerTimes();
-  }, [currentMonth, currentYear, currentHijriMonth, settings.language]);
+  }, [currentMonth, currentYear, settings.language, settings.location]);
   
   // Switch to previous month
   const prevMonth = () => {
     if (currentMonth === 0) {
       setCurrentMonth(11);
       setCurrentYear(currentYear - 1);
-      // Update Hijri date (simplified)
-      setCurrentHijriMonth(currentHijriMonth === 1 ? 12 : currentHijriMonth - 1);
-      if (currentHijriMonth === 1) setCurrentHijriYear(currentHijriYear - 1);
+      
+      // Calculate new Hijri date for previous month
+      const prevDate = new Date(currentYear - 1, 11, 15);
+      const prevHijri = calculateHijriDate(prevDate);
+      setCurrentHijriMonth(prevHijri.month);
+      setCurrentHijriYear(prevHijri.year);
     } else {
       setCurrentMonth(currentMonth - 1);
-      // Update Hijri date (simplified)
-      setCurrentHijriMonth(currentHijriMonth === 1 ? 12 : currentHijriMonth - 1);
-      if (currentHijriMonth === 1) setCurrentHijriYear(currentHijriYear - 1);
+      
+      // Calculate new Hijri date for previous month
+      const prevDate = new Date(currentYear, currentMonth - 1, 15);
+      const prevHijri = calculateHijriDate(prevDate);
+      setCurrentHijriMonth(prevHijri.month);
+      setCurrentHijriYear(prevHijri.year);
     }
   };
   
@@ -167,14 +159,20 @@ const MonthlyPrayerTimes = () => {
     if (currentMonth === 11) {
       setCurrentMonth(0);
       setCurrentYear(currentYear + 1);
-      // Update Hijri date (simplified)
-      setCurrentHijriMonth(currentHijriMonth === 12 ? 1 : currentHijriMonth + 1);
-      if (currentHijriMonth === 12) setCurrentHijriYear(currentHijriYear + 1);
+      
+      // Calculate new Hijri date for next month
+      const nextDate = new Date(currentYear + 1, 0, 15);
+      const nextHijri = calculateHijriDate(nextDate);
+      setCurrentHijriMonth(nextHijri.month);
+      setCurrentHijriYear(nextHijri.year);
     } else {
       setCurrentMonth(currentMonth + 1);
-      // Update Hijri date (simplified)
-      setCurrentHijriMonth(currentHijriMonth === 12 ? 1 : currentHijriMonth + 1);
-      if (currentHijriMonth === 12) setCurrentHijriYear(currentHijriYear + 1);
+      
+      // Calculate new Hijri date for next month
+      const nextDate = new Date(currentYear, currentMonth + 1, 15);
+      const nextHijri = calculateHijriDate(nextDate);
+      setCurrentHijriMonth(nextHijri.month);
+      setCurrentHijriYear(nextHijri.year);
     }
   };
   
@@ -182,7 +180,31 @@ const MonthlyPrayerTimes = () => {
   const selectHijriMonth = (monthId: number) => {
     setCurrentHijriMonth(monthId);
     setShowMonthSelect(false);
-    // This is simplified - in a real app, you would convert from Hijri to Gregorian
+    
+    // Approximating Gregorian equivalent (simplified)
+    // In a real app, you would use a proper conversion library
+    const today = new Date();
+    const currentHijriDate = calculateHijriDate(today);
+    
+    // If selected month is ahead of current Hijri month
+    if (monthId > currentHijriDate.month) {
+      // Go forward by the difference in months
+      const monthsAhead = monthId - currentHijriDate.month;
+      const newDate = new Date();
+      newDate.setMonth(newDate.getMonth() + monthsAhead);
+      setCurrentMonth(newDate.getMonth());
+      setCurrentYear(newDate.getFullYear());
+    } 
+    // If selected month is behind current Hijri month
+    else if (monthId < currentHijriDate.month) {
+      // Go backward by the difference in months
+      const monthsBehind = currentHijriDate.month - monthId;
+      const newDate = new Date();
+      newDate.setMonth(newDate.getMonth() - monthsBehind);
+      setCurrentMonth(newDate.getMonth());
+      setCurrentYear(newDate.getFullYear());
+    }
+    // If same month, no change needed
   };
   
   // Get month name based on current language

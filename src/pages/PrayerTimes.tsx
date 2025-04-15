@@ -15,9 +15,9 @@ const PrayerTimes = () => {
   const { t } = useTranslation(settings.language);
   const { toast } = useToast();
   
-  const [islamicDate, setIslamicDate] = useState(getCurrentIslamicDate());
+  const [islamicDate, setIslamicDate] = useState(getCurrentIslamicDate(settings.language));
   const [prayerTimes, setPrayerTimes] = useState(getPrayerTimes(settings.location.latitude, settings.location.longitude, settings.language));
-  const [nextPrayerTime, setNextPrayerTime] = useState(getTimeToNextPrayer(settings.language));
+  const [nextPrayerTime, setNextPrayerTime] = useState(getTimeToNextPrayer(settings.language, true));
   const [showNotificationOptions, setShowNotificationOptions] = useState(false);
   const [gregorianDate, setGregorianDate] = useState("");
   const [dayOfWeek, setDayOfWeek] = useState("");
@@ -42,6 +42,11 @@ const PrayerTimes = () => {
     }
   }, [settings.language]);
 
+  // Update Islamic date whenever settings change
+  useEffect(() => {
+    setIslamicDate(getCurrentIslamicDate(settings.language));
+  }, [settings.language]);
+
   // Get next prayer name
   const getNextPrayer = () => {
     const next = prayerTimes.find(prayer => prayer.isNext);
@@ -56,8 +61,8 @@ const PrayerTimes = () => {
   // Update countdown timer
   useEffect(() => {
     const interval = setInterval(() => {
-      setNextPrayerTime(getTimeToNextPrayer(settings.language));
-    }, 1000); // Update every second for more accurate countdown
+      setNextPrayerTime(getTimeToNextPrayer(settings.language, true));
+    }, 1000); // Update every second for accurate countdown
 
     return () => clearInterval(interval);
   }, [settings.language]);
@@ -77,47 +82,68 @@ const PrayerTimes = () => {
   };
   
   // Enable notifications with specific settings
-  const enableNotifications = (type: 'beforeAdhan' | 'atAdhan' | 'iqamah') => {
+  const enableNotifications = (type: 'atAdhan' | 'iqamah' | 'both' | 'none') => {
     // Request permission
     Notification.requestPermission().then(function(permission) {
       if (permission === "granted") {
         updateNotificationSettings({ 
-          enabled: true, 
-          prayerReminders: true,
+          enabled: type !== 'none', 
+          prayerReminders: type !== 'none',
           reminderType: type 
         });
         
+        const notificationTitle = settings.language === "ar" ? "تم تفعيل الإشعارات" : "Notifications Enabled";
+        let notificationDescription = "";
+        
+        if (settings.language === "ar") {
+          switch(type) {
+            case 'atAdhan':
+              notificationDescription = "ستتلقى تنبيهات عند وقت الأذان";
+              break;
+            case 'iqamah':
+              notificationDescription = "ستتلقى تنبيهات عند وقت الإقامة";
+              break;
+            case 'both':
+              notificationDescription = "ستتلقى تنبيهات عند وقت الأذان والإقامة";
+              break;
+            case 'none':
+              notificationDescription = "تم إيقاف تنبيهات الصلاة";
+              break;
+          }
+        } else {
+          switch(type) {
+            case 'atAdhan':
+              notificationDescription = "You will receive alerts at Adhan time";
+              break;
+            case 'iqamah':
+              notificationDescription = "You will receive alerts at Iqamah time";
+              break;
+            case 'both':
+              notificationDescription = "You will receive alerts at both Adhan and Iqamah times";
+              break;
+            case 'none':
+              notificationDescription = "Prayer notifications have been turned off";
+              break;
+          }
+        }
+        
         toast({
-          title: settings.language === "ar" ? "تم تفعيل الإشعارات" : "Notifications Enabled",
-          description: settings.language === "ar" 
-            ? "ستتلقى تنبيهات بأوقات الصلاة" 
-            : "You will receive prayer time alerts"
+          title: type === 'none' 
+            ? (settings.language === "ar" ? "تم إيقاف الإشعارات" : "Notifications Disabled")
+            : notificationTitle,
+          description: notificationDescription
         });
         
-        // Show sample notification
-        new Notification(settings.language === "ar" ? "أذكاري" : "Azkari", {
-          body: settings.language === "ar" 
-            ? "تم تفعيل تنبيهات الصلاة" 
-            : "Prayer time alerts activated"
-        });
+        // Show sample notification if enabled
+        if (type !== 'none') {
+          new Notification(settings.language === "ar" ? "أذكاري" : "Azkari", {
+            body: notificationDescription
+          });
+        }
         
         setShowNotificationOptions(false);
       }
     });
-  };
-  
-  // Disable notifications
-  const disableNotifications = () => {
-    updateNotificationSettings({ prayerReminders: false });
-    
-    toast({
-      title: settings.language === "ar" ? "تم إيقاف الإشعارات" : "Notifications Disabled",
-      description: settings.language === "ar" 
-        ? "لن تتلقى تنبيهات بأوقات الصلاة" 
-        : "You won't receive prayer time alerts"
-    });
-    
-    setShowNotificationOptions(false);
   };
 
   // Update location
@@ -127,8 +153,8 @@ const PrayerTimes = () => {
       toast({
         title: settings.language === "ar" ? "تم تحديث الموقع" : "Location Updated",
         description: settings.language === "ar" 
-          ? "تم تحديث موقعك ومواقيت الصلاة" 
-          : "Your location and prayer times have been updated"
+          ? `تم تحديث موقعك (${settings.location.city}) ومواقيت الصلاة` 
+          : `Your location (${settings.location.city}) and prayer times have been updated`
       });
     }
   };
@@ -156,25 +182,28 @@ const PrayerTimes = () => {
               </div>
               <div className="p-2">
                 <button 
-                  onClick={() => enableNotifications('beforeAdhan')}
-                  className="w-full text-left p-2.5 hover:bg-slate-700 rounded-md transition-colors"
-                >
-                  {settings.language === "ar" ? "قبل الأذان" : "Before Adhan"}
-                </button>
-                <button 
                   onClick={() => enableNotifications('atAdhan')}
-                  className="w-full text-left p-2.5 hover:bg-slate-700 rounded-md transition-colors"
+                  className={`w-full text-left p-2.5 hover:bg-slate-700 rounded-md transition-colors
+                    ${settings.notifications.reminderType === 'atAdhan' ? 'bg-amber-900/30 text-amber-400' : ''}`}
                 >
                   {settings.language === "ar" ? "عند الأذان" : "At Adhan Time"}
                 </button>
                 <button 
                   onClick={() => enableNotifications('iqamah')}
-                  className="w-full text-left p-2.5 hover:bg-slate-700 rounded-md transition-colors"
+                  className={`w-full text-left p-2.5 hover:bg-slate-700 rounded-md transition-colors
+                    ${settings.notifications.reminderType === 'iqamah' ? 'bg-amber-900/30 text-amber-400' : ''}`}
                 >
                   {settings.language === "ar" ? "عند الإقامة" : "At Iqamah Time"}
                 </button>
                 <button 
-                  onClick={disableNotifications}
+                  onClick={() => enableNotifications('both')}
+                  className={`w-full text-left p-2.5 hover:bg-slate-700 rounded-md transition-colors
+                    ${settings.notifications.reminderType === 'both' ? 'bg-amber-900/30 text-amber-400' : ''}`}
+                >
+                  {settings.language === "ar" ? "الأذان والإقامة معاً" : "Both Adhan & Iqamah"}
+                </button>
+                <button 
+                  onClick={() => enableNotifications('none')}
                   className="w-full text-left p-2.5 text-red-400 hover:bg-slate-700 rounded-md transition-colors mt-1"
                 >
                   {settings.language === "ar" ? "إيقاف الإشعارات" : "Turn Off Notifications"}
@@ -197,7 +226,10 @@ const PrayerTimes = () => {
             className="flex items-center text-center hover:bg-slate-700/50 p-1.5 rounded-md transition-colors"
           >
             <MapPin className="w-4 h-4 text-amber-400 mr-1.5" />
-            <p className="text-amber-400 text-lg font-arabic">{settings.location.city}</p>
+            <p className="text-amber-400 text-lg font-arabic">
+              {settings.location.city}
+              {settings.location.region && `, ${settings.location.region}`}
+            </p>
           </button>
           <div className="text-right">
             <p className="text-gray-300 text-sm font-arabic">

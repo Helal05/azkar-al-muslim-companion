@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
@@ -71,7 +72,7 @@ const AzkarList = () => {
   }
   
   const currentAzkar = categoryAzkar[currentIndex];
-  const currentAzkarId = String(currentAzkar.id);
+  const currentAzkarId = currentAzkar.id;
   const isCurrentFavorite = favorites.includes(currentAzkarId);
   
   const decrementCounter = () => {
@@ -111,16 +112,14 @@ const AzkarList = () => {
   };
   
   const toggleFavorite = () => {
-    const azkarId = String(currentAzkar.id);
-    
     if (isCurrentFavorite) {
-      setFavorites(favorites.filter(id => id !== azkarId));
+      setFavorites(favorites.filter(id => id !== currentAzkarId));
       toast({
         title: settings.language === "ar" ? "تمت الإزالة من المفضلة" : "Removed from favorites",
         description: "",
       });
     } else {
-      setFavorites([...favorites, azkarId]);
+      setFavorites([...favorites, currentAzkarId]);
       toast({
         title: settings.language === "ar" ? "تمت الإضافة للمفضلة" : "Added to favorites",
         description: "",
@@ -156,7 +155,7 @@ const AzkarList = () => {
           <List className="w-5 h-5" />
         </button>
         <h2 className="text-xl font-arabic font-bold">
-          {category.name}
+          {settings.language === "ar" ? category.name : category.nameEn || category.name}
         </h2>
         <button className="p-2">
           <ChevronRight className="w-5 h-5" />
@@ -211,6 +210,7 @@ const AzkarList = () => {
             <button 
               onClick={toggleFavorite}
               className="text-white"
+              aria-label={isCurrentFavorite ? "إزالة من المفضلة" : "إضافة إلى المفضلة"}
             >
               <Heart className={`h-6 w-6 ${isCurrentFavorite ? 'fill-red-500 text-red-500' : 'text-white'}`} />
             </button>
@@ -218,6 +218,7 @@ const AzkarList = () => {
             <button 
               onClick={shareAzkar}
               className="text-white"
+              aria-label="مشاركة الذكر"
             >
               <Share2 className="h-6 w-6" />
             </button>
@@ -230,6 +231,7 @@ const AzkarList = () => {
                   ? 'text-gray-500 cursor-not-allowed' 
                   : 'text-white'
               }`}
+              aria-label="الذكر السابق"
             >
               <ChevronRight className="w-6 h-6" />
             </button>
@@ -238,6 +240,7 @@ const AzkarList = () => {
             <button 
               onClick={decrementCounter}
               className="bg-gray-800 text-white px-3 py-1 rounded-full text-sm font-mono"
+              aria-label="تسبيح"
             >
               {counter}/{currentAzkar.count}
             </button>
@@ -250,6 +253,7 @@ const AzkarList = () => {
                   ? 'text-gray-500 cursor-not-allowed' 
                   : 'text-white'
               }`}
+              aria-label="الذكر التالي"
             >
               <ChevronLeft className="w-6 h-6" />
             </button>

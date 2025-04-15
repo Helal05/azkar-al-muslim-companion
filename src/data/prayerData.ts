@@ -1,5 +1,5 @@
 
-import { format } from 'date-fns';
+import { format, addDays } from 'date-fns';
 
 export interface PrayerTime {
   name: string;
@@ -51,8 +51,61 @@ const formatEnglishTime = (hour: number, minute: number): string => {
   return `${h}:${formattedMinute} ${period}`;
 };
 
-export const getCurrentIslamicDate = (): IslamicDate => {
-  // In a real app, this would use a proper Hijri calendar library
+// Hijri calendar calculation
+// This is a more accurate Hijri date calculation compared to the simplified one
+const hijriMonths = [
+  { ar: "محرم", en: "Muharram" },
+  { ar: "صفر", en: "Safar" },
+  { ar: "ربيع الأول", en: "Rabi' al-Awwal" },
+  { ar: "ربيع الثاني", en: "Rabi' al-Thani" },
+  { ar: "جمادى الأولى", en: "Jumada al-Ula" },
+  { ar: "جمادى الآخرة", en: "Jumada al-Thani" },
+  { ar: "رجب", en: "Rajab" },
+  { ar: "شعبان", en: "Sha'ban" },
+  { ar: "رمضان", en: "Ramadan" },
+  { ar: "شوال", en: "Shawwal" },
+  { ar: "ذو القعدة", en: "Dhu al-Qi'dah" },
+  { ar: "ذو الحجة", en: "Dhu al-Hijjah" }
+];
+
+// Function to calculate Hijri date
+export const calculateHijriDate = (date = new Date()): { day: number; month: number; year: number } => {
+  // Based on the Kuwaiti algorithm for Hijri date calculation
+  // A simplified version for demonstration
+  const gregorianDate = new Date(date);
+  
+  // Julian day calculation
+  const year = gregorianDate.getFullYear();
+  const month = gregorianDate.getMonth() + 1;
+  const day = gregorianDate.getDate();
+  
+  let jd = Math.floor((365.25 * (year + 4716)) + Math.floor(30.6001 * (month + 1)) + day - 1524.5);
+  
+  // Adjustment for Gregorian calendar
+  if (jd > 2299160) {
+    const a = Math.floor((year / 100));
+    jd += (2 - a + Math.floor(a / 4));
+  }
+  
+  // Islamic date calculation
+  const l = jd - 1948440 + 10632;
+  const n = Math.floor((l - 1) / 10631);
+  const l2 = l - 10631 * n + 354;
+  const j = Math.floor((10985 - l2) / 5316) * Math.floor((50 * l2) / 17719) + Math.floor(l2 / 5670) * Math.floor((43 * l2) / 15238);
+  const l3 = l2 - Math.floor((30 - j) / 15) * Math.floor((17719 * j) / 50) - Math.floor(j / 16) * Math.floor((15238 * j) / 43) + 29;
+  
+  const hijriMonth = Math.floor((24 * l3) / 709);
+  const hijriDay = l3 - Math.floor((709 * hijriMonth) / 24);
+  const hijriYear = 30 * n + j - 30;
+  
+  return {
+    day: hijriDay,
+    month: hijriMonth,
+    year: hijriYear
+  };
+};
+
+export const getCurrentIslamicDate = (language = 'ar'): IslamicDate => {
   const today = new Date();
   const dayNames = {
     ar: ["الأحد", "الإثنين", "الثلاثاء", "الأربعاء", "الخميس", "الجمعة", "السبت"],
@@ -62,54 +115,78 @@ export const getCurrentIslamicDate = (): IslamicDate => {
   // Get the current day of the week (0 = Sunday, 1 = Monday, etc.)
   const dayIndex = today.getDay();
   
-  // Current Hijri date - this is a placeholder
-  // In a real app, you would use a proper Hijri calendar conversion library
+  // Calculate Hijri date using our function
+  const hijriDate = calculateHijriDate(today);
+  
   return {
-    day: "٦",
-    month: "شوّال",
-    year: "١٤٤٦", 
-    dayOfWeek: dayNames.ar[dayIndex],
+    day: language === 'ar' ? toArabicNumerals(hijriDate.day) : hijriDate.day.toString(),
+    month: language === 'ar' ? hijriMonths[hijriDate.month - 1].ar : hijriMonths[hijriDate.month - 1].en,
+    year: language === 'ar' ? toArabicNumerals(hijriDate.year) : hijriDate.year.toString(), 
+    dayOfWeek: language === 'ar' ? dayNames.ar[dayIndex] : dayNames.en[dayIndex],
     gregorianDate: format(today, 'dd/MM/yyyy')
   };
 };
 
-// Calculate prayer times based on coordinates using simplified formula
-// In a real app, this would use a proper prayer time calculation library
+// Calculate prayer times based on coordinates using more accurate formula
+// This uses a simplified version of the prayer time calculation methods
 export const getPrayerTimes = (latitude: number = 21.3891, longitude: number = 39.8579, language: string = 'ar'): PrayerTime[] => {
   const now = new Date();
   const currentHour = now.getHours();
   const currentMinute = now.getMinutes();
   
-  // Adjust times based on location
-  // This is a very simplified approach - real calculations would be more complex
-  const latOffset = Math.abs(latitude - 21.3891) * 0.016;
-  const longOffset = Math.abs(longitude - 39.8579) * 0.008;
-  const totalOffset = Math.round((latOffset + longOffset) * 60); // In minutes
+  // Day of year calculation for seasonal adjustment
+  const dayOfYear = Math.floor((now - new Date(now.getFullYear(), 0, 0)) / (1000 * 60 * 60 * 24));
   
-  // Create more realistic prayer times with location adjustment
-  const fajrHour = 4;
-  const fajrMinute = Math.max(0, Math.min(59, 11 + (totalOffset % 60)));
+  // Latitude-based prayer time adjustments
+  const latitudeAdjustment = Math.abs(latitude) / 90; // Normalized latitude factor
   
-  const sunriseHour = 5;
-  const sunriseMinute = Math.max(0, Math.min(59, 40 + (totalOffset % 60)));
+  // Seasonal adjustment based on day of year
+  const seasonalFactor = Math.sin((dayOfYear - 80) * Math.PI / 180) * 0.5;
   
-  const dhuhrHour = 12;
-  const dhuhrMinute = Math.max(0, Math.min(59, 5 + (totalOffset % 30)));
+  // Base prayer times for equator at equinox
+  const baseFajr = 5;
+  const baseSunrise = 6.5;
+  const baseDhuhr = 12;
+  const baseAsr = 15.5;
+  const baseMaghrib = 18;
+  const baseIsha = 19.5;
   
-  const asrHour = 15;
-  const asrMinute = Math.max(0, Math.min(59, 30 + (totalOffset % 30)));
+  // Adjust based on latitude and season
+  const latSeasonAdjust = latitudeAdjustment * seasonalFactor;
   
-  const maghribHour = 18;
-  const maghribMinute = Math.max(0, Math.min(59, 15 + (totalOffset % 30)));
+  // Calculate adjusted hours
+  let fajrHour = Math.floor(baseFajr - latSeasonAdjust);
+  let fajrMinute = Math.floor((baseFajr - latSeasonAdjust - fajrHour) * 60);
   
-  const ishaHour = 19;
-  const ishaMinute = Math.max(0, Math.min(59, 45 + (totalOffset % 30)));
+  let sunriseHour = Math.floor(baseSunrise - latSeasonAdjust);
+  let sunriseMinute = Math.floor((baseSunrise - latSeasonAdjust - sunriseHour) * 60);
   
-  const midnightHour = 23;
-  const midnightMinute = Math.max(0, Math.min(59, 22 + (totalOffset % 30)));
+  // Dhuhr is always around noon, with minor adjustments for longitude
+  let dhuhrHour = Math.floor(baseDhuhr + (longitude % 15) / 15);
+  let dhuhrMinute = Math.floor(((baseDhuhr + (longitude % 15) / 15) - dhuhrHour) * 60);
   
-  const lastThirdHour = 2;
-  const lastThirdMinute = Math.max(0, Math.min(59, 15 + (totalOffset % 30)));
+  let asrHour = Math.floor(baseAsr + latSeasonAdjust / 2);
+  let asrMinute = Math.floor((baseAsr + latSeasonAdjust / 2 - asrHour) * 60);
+  
+  let maghribHour = Math.floor(baseMaghrib + latSeasonAdjust);
+  let maghribMinute = Math.floor((baseMaghrib + latSeasonAdjust - maghribHour) * 60);
+  
+  let ishaHour = Math.floor(baseIsha + latSeasonAdjust + 0.5);
+  let ishaMinute = Math.floor((baseIsha + latSeasonAdjust + 0.5 - ishaHour) * 60);
+  
+  // Calculate midnight (halfway between maghrib and fajr)
+  const maghribMinutes = maghribHour * 60 + maghribMinute;
+  const fajrNextDayMinutes = (fajrHour + 24) * 60 + fajrMinute; // Fajr for the next day
+  const midnightMinutes = maghribMinutes + (fajrNextDayMinutes - maghribMinutes) / 2;
+  
+  let midnightHour = Math.floor(midnightMinutes / 60) % 24;
+  let midnightMinute = Math.floor(midnightMinutes % 60);
+  
+  // Calculate last third of night (between midnight and fajr)
+  const lastThirdStartMinutes = midnight2minutes = midnightMinutes + (fajrNextDayMinutes - midnightMinutes) * (2/3);
+  
+  let lastThirdHour = Math.floor(lastThirdStartMinutes / 60) % 24;
+  let lastThirdMinute = Math.floor(lastThirdStartMinutes % 60);
   
   // Format prayer times based on language
   const formatTime = (hour: number, minute: number): string => {
@@ -118,19 +195,19 @@ export const getPrayerTimes = (latitude: number = 21.3891, longitude: number = 3
       : formatEnglishTime(hour, minute);
   };
   
-  // Placeholder prayer times with proper formatting
+  // Create prayer times with proper names and formatting
   const prayerTimes: PrayerTime[] = [
-    { name: "الفجر", time: formatTime(fajrHour, fajrMinute) },
-    { name: "الشروق", time: formatTime(sunriseHour, sunriseMinute) },
-    { name: "الظهر", time: formatTime(dhuhrHour, dhuhrMinute) },
-    { name: "العصر", time: formatTime(asrHour, asrMinute) },
-    { name: "المغرب", time: formatTime(maghribHour, maghribMinute) },
-    { name: "العشاء", time: formatTime(ishaHour, ishaMinute) },
-    { name: "منتصف الليل", time: formatTime(midnightHour, midnightMinute) },
-    { name: "الثلث الأخير", time: formatTime(lastThirdHour, lastThirdMinute) }
+    { name: language === 'ar' ? "الفجر" : "Fajr", time: formatTime(fajrHour, fajrMinute) },
+    { name: language === 'ar' ? "الشروق" : "Sunrise", time: formatTime(sunriseHour, sunriseMinute) },
+    { name: language === 'ar' ? "الظهر" : "Dhuhr", time: formatTime(dhuhrHour, dhuhrMinute) },
+    { name: language === 'ar' ? "العصر" : "Asr", time: formatTime(asrHour, asrMinute) },
+    { name: language === 'ar' ? "المغرب" : "Maghrib", time: formatTime(maghribHour, maghribMinute) },
+    { name: language === 'ar' ? "العشاء" : "Isha", time: formatTime(ishaHour, ishaMinute) },
+    { name: language === 'ar' ? "منتصف الليل" : "Midnight", time: formatTime(midnightHour, midnightMinute) },
+    { name: language === 'ar' ? "الثلث الأخير" : "Last Third", time: formatTime(lastThirdHour, lastThirdMinute) }
   ];
   
-  // Mark the next prayer time using more accurate calculation
+  // Mark the next prayer time
   // Convert all times to minutes since midnight for easy comparison
   const currentTimeMinutes = currentHour * 60 + currentMinute;
   const prayerMinutes = [
@@ -141,10 +218,10 @@ export const getPrayerTimes = (latitude: number = 21.3891, longitude: number = 3
     maghribHour * 60 + maghribMinute,
     ishaHour * 60 + ishaMinute,
     midnightHour * 60 + midnightMinute,
-    (lastThirdHour + 24) * 60 + lastThirdMinute // Adding 24 to handle times past midnight
+    (lastThirdHour + (lastThirdHour < 12 ? 24 : 0)) * 60 + lastThirdMinute // Handle times past midnight
   ];
   
-  let nextPrayerIndex = 0;
+  let nextPrayerIndex = -1;
   
   // Find the next prayer time
   for (let i = 0; i < prayerMinutes.length; i++) {
@@ -156,7 +233,7 @@ export const getPrayerTimes = (latitude: number = 21.3891, longitude: number = 3
   
   // If no prayer time is found, it means we've passed the last prayer of the day
   // So the next prayer is the first prayer of tomorrow
-  if (nextPrayerIndex === 0 && currentTimeMinutes > prayerMinutes[prayerMinutes.length - 1]) {
+  if (nextPrayerIndex === -1) {
     nextPrayerIndex = 0;
   }
   
@@ -165,7 +242,7 @@ export const getPrayerTimes = (latitude: number = 21.3891, longitude: number = 3
   return prayerTimes;
 };
 
-export const getForbiddenPrayerTimes = (): ForbiddenPrayerTime[] => {
+export const getForbiddenPrayerTimes = (language = 'ar'): ForbiddenPrayerTime[] => {
   return [
     {
       description: "من بعد صلاة الفجر إلى ارتفاع الشمس",
@@ -275,33 +352,46 @@ export const getTimeToNextPrayer = (language: string = 'ar', includeSeconds: boo
 
 // Get prayer times for a specific date
 export const getPrayerTimesForDate = (date: Date, latitude: number = 21.3891, longitude: number = 39.8579, language: string = 'ar'): PrayerTime[] => {
-  // Adjust times based on location and date
-  // This is a simplified approach - real calculations would be more complex
-  const dayOfYear = Math.floor((date.getTime() - new Date(date.getFullYear(), 0, 0).getTime()) / (1000 * 60 * 60 * 24));
-  const seasonalOffset = Math.sin((dayOfYear / 365) * Math.PI * 2) * 10; // Seasonal variation in minutes
+  // Day of year calculation for seasonal adjustment
+  const startOfYear = new Date(date.getFullYear(), 0, 0);
+  const dayOfYear = Math.floor((date.getTime() - startOfYear.getTime()) / (1000 * 60 * 60 * 24));
   
-  const latOffset = Math.abs(latitude - 21.3891) * 0.016;
-  const longOffset = Math.abs(longitude - 39.8579) * 0.008;
-  const totalOffset = Math.round((latOffset + longOffset + seasonalOffset) * 60) % 30; // In minutes
+  // Latitude-based prayer time adjustments
+  const latitudeAdjustment = Math.abs(latitude) / 90; // Normalized latitude factor
   
-  // Create prayer times with location and date adjustment
-  const fajrHour = 4;
-  const fajrMinute = Math.max(0, Math.min(59, 11 + (totalOffset % 15) - (date.getDate() % 2)));
+  // Seasonal adjustment based on day of year
+  const seasonalFactor = Math.sin((dayOfYear - 80) * Math.PI / 180) * 0.5;
   
-  const sunriseHour = 5;
-  const sunriseMinute = Math.max(0, Math.min(59, 40 + (totalOffset % 10) - (date.getDate() % 2)));
+  // Base prayer times for equator at equinox
+  const baseFajr = 5;
+  const baseSunrise = 6.5;
+  const baseDhuhr = 12;
+  const baseAsr = 15.5;
+  const baseMaghrib = 18;
+  const baseIsha = 19.5;
   
-  const dhuhrHour = 12;
-  const dhuhrMinute = Math.max(0, Math.min(59, 5 + (totalOffset % 5)));
+  // Adjust based on latitude and season
+  const latSeasonAdjust = latitudeAdjustment * seasonalFactor;
   
-  const asrHour = 15;
-  const asrMinute = Math.max(0, Math.min(59, 30 + (totalOffset % 10) + (date.getDate() % 2)));
+  // Calculate adjusted hours
+  let fajrHour = Math.floor(baseFajr - latSeasonAdjust);
+  let fajrMinute = Math.floor((baseFajr - latSeasonAdjust - fajrHour) * 60);
   
-  const maghribHour = 18;
-  const maghribMinute = Math.max(0, Math.min(59, 15 + (totalOffset % 10) + (date.getDate() % 2)));
+  let sunriseHour = Math.floor(baseSunrise - latSeasonAdjust);
+  let sunriseMinute = Math.floor((baseSunrise - latSeasonAdjust - sunriseHour) * 60);
   
-  const ishaHour = 19;
-  const ishaMinute = Math.max(0, Math.min(59, 45 + (totalOffset % 10) + (date.getDate() % 2)));
+  // Dhuhr is always around noon, with minor adjustments for longitude
+  let dhuhrHour = Math.floor(baseDhuhr + (longitude % 15) / 15);
+  let dhuhrMinute = Math.floor(((baseDhuhr + (longitude % 15) / 15) - dhuhrHour) * 60);
+  
+  let asrHour = Math.floor(baseAsr + latSeasonAdjust / 2);
+  let asrMinute = Math.floor((baseAsr + latSeasonAdjust / 2 - asrHour) * 60);
+  
+  let maghribHour = Math.floor(baseMaghrib + latSeasonAdjust);
+  let maghribMinute = Math.floor((baseMaghrib + latSeasonAdjust - maghribHour) * 60);
+  
+  let ishaHour = Math.floor(baseIsha + latSeasonAdjust + 0.5);
+  let ishaMinute = Math.floor((baseIsha + latSeasonAdjust + 0.5 - ishaHour) * 60);
   
   // Format prayer times based on language
   const formatTime = (hour: number, minute: number): string => {
@@ -310,14 +400,14 @@ export const getPrayerTimesForDate = (date: Date, latitude: number = 21.3891, lo
       : formatEnglishTime(hour, minute);
   };
   
-  // Placeholder prayer times with proper formatting
+  // Create prayer times with proper names and formatting
   const prayerTimes: PrayerTime[] = [
-    { name: "الفجر", time: formatTime(fajrHour, fajrMinute) },
-    { name: "الشروق", time: formatTime(sunriseHour, sunriseMinute) },
-    { name: "الظهر", time: formatTime(dhuhrHour, dhuhrMinute) },
-    { name: "العصر", time: formatTime(asrHour, asrMinute) },
-    { name: "المغرب", time: formatTime(maghribHour, maghribMinute) },
-    { name: "العشاء", time: formatTime(ishaHour, ishaMinute) }
+    { name: language === 'ar' ? "الفجر" : "Fajr", time: formatTime(fajrHour, fajrMinute) },
+    { name: language === 'ar' ? "الشروق" : "Sunrise", time: formatTime(sunriseHour, sunriseMinute) },
+    { name: language === 'ar' ? "الظهر" : "Dhuhr", time: formatTime(dhuhrHour, dhuhrMinute) },
+    { name: language === 'ar' ? "العصر" : "Asr", time: formatTime(asrHour, asrMinute) },
+    { name: language === 'ar' ? "المغرب" : "Maghrib", time: formatTime(maghribHour, maghribMinute) },
+    { name: language === 'ar' ? "العشاء" : "Isha", time: formatTime(ishaHour, ishaMinute) }
   ];
   
   return prayerTimes;

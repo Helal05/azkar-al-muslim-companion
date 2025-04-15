@@ -6,6 +6,8 @@ export interface AppSettings {
   // Location settings
   location: {
     city: string;
+    region: string;
+    country: string;
     latitude: number;
     longitude: number;
     method: string;
@@ -17,7 +19,7 @@ export interface AppSettings {
     azkarReminders: boolean;
     reminderTime: number; // minutes before prayer
     adhanSound: boolean;
-    reminderType: 'beforeAdhan' | 'atAdhan' | 'iqamah';
+    reminderType: 'atAdhan' | 'iqamah' | 'both' | 'none';
   };
   // Appearance settings
   appearance: {
@@ -44,6 +46,8 @@ interface AppSettingsContextType {
 const defaultSettings: AppSettings = {
   location: {
     city: "مكة المكرمة",
+    region: "",
+    country: "المملكة العربية السعودية",
     latitude: 21.3891,
     longitude: 39.8579,
     method: "أم القرى"
@@ -54,7 +58,7 @@ const defaultSettings: AppSettings = {
     azkarReminders: false,
     reminderTime: 10,
     adhanSound: true,
-    reminderType: 'beforeAdhan'
+    reminderType: 'atAdhan'
   },
   appearance: {
     darkMode: true,
@@ -128,7 +132,18 @@ export const AppSettingsProvider: React.FC<{ children: ReactNode }> = ({ childre
                     data.address.state ||
                     "Unknown";
         
-        updateLocationSettings({ city });
+        const region = data.address.state || 
+                      data.address.province || 
+                      data.address.region || 
+                      "";
+                      
+        const country = data.address.country || "";
+        
+        updateLocationSettings({ 
+          city,
+          region,
+          country
+        });
       }
     } catch (error) {
       console.error("Error getting city name:", error);
@@ -255,7 +270,11 @@ export const AppSettingsProvider: React.FC<{ children: ReactNode }> = ({ childre
     
     try {
       const position = await new Promise<GeolocationPosition>((resolve, reject) => {
-        navigator.geolocation.getCurrentPosition(resolve, reject);
+        navigator.geolocation.getCurrentPosition(resolve, reject, {
+          enableHighAccuracy: true,
+          timeout: 10000,
+          maximumAge: 0
+        });
       });
       
       const { latitude, longitude } = position.coords;
@@ -279,16 +298,25 @@ export const AppSettingsProvider: React.FC<{ children: ReactNode }> = ({ childre
                     data.address?.county ||
                     data.address?.state ||
                     "Unknown";
+                    
+        const region = data.address?.state || 
+                      data.address?.province || 
+                      data.address?.region || 
+                      "";
+                      
+        const country = data.address?.country || "";
         
         updateLocationSettings({
-          city
+          city,
+          region,
+          country
         });
         
         toast({
           title: settings.language === "ar" ? "تم تحديد موقعك" : "Location detected",
           description: settings.language === "ar" 
-            ? `تم تحديد موقعك: ${city}`
-            : `Your location: ${city}`
+            ? `تم تحديد موقعك: ${city}, ${region}`
+            : `Your location: ${city}, ${region}`
         });
         
         return true;

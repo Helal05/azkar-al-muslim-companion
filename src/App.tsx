@@ -21,6 +21,7 @@ import ForbiddenPrayerTimes from "./pages/ForbiddenPrayerTimes";
 import MonthlyPrayerTimes from "./pages/MonthlyPrayerTimes";
 import Search from "./pages/Search";
 import NamesOfAllah from "./pages/NamesOfAllah";
+import NightDuas from "./pages/NightDuas";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -41,6 +42,7 @@ const App = () => (
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/category/:categoryId" element={<AzkarList />} />
+            <Route path="/night-duas" element={<NightDuas />} />
             <Route path="/tasbih" element={<Tasbih />} />
             <Route path="/qibla" element={<Qibla />} />
             <Route path="/settings" element={<Settings />} />
