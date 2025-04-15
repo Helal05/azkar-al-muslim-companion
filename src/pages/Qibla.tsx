@@ -6,6 +6,11 @@ import { ChevronLeft, Compass, MapPin } from "lucide-react";
 import { useAppSettings } from "../contexts/AppSettingsContext";
 import { useToast } from "@/hooks/use-toast";
 
+// Define a custom interface for extending DeviceOrientationEvent with WebKit properties
+interface ExtendedDeviceOrientationEvent extends DeviceOrientationEvent {
+  webkitCompassHeading?: number;
+}
+
 const Qibla = () => {
   const navigate = useNavigate();
   const { settings, requestLocationPermission } = useAppSettings();
@@ -100,10 +105,11 @@ const Qibla = () => {
   const handleOrientation = (event: DeviceOrientationEvent) => {
     // Get the device heading (alpha) and adjust it
     // Alpha is the compass direction the device is facing
-    let heading = event.webkitCompassHeading || event.alpha || 0;
+    const extendedEvent = event as ExtendedDeviceOrientationEvent;
+    let heading = extendedEvent.webkitCompassHeading || event.alpha || 0;
     
     // For devices using alpha instead of webkitCompassHeading
-    if (event.alpha && !event.webkitCompassHeading) {
+    if (event.alpha && !extendedEvent.webkitCompassHeading) {
       heading = 360 - heading; // Convert to same reference as webkitCompassHeading
     }
     
@@ -175,73 +181,71 @@ const Qibla = () => {
         {qiblaDirection !== null ? (
           <>
             {hasPermission ? (
-              <>
-                <div className="relative w-64 h-64 mb-8">
-                  <motion.div 
-                    className="w-full h-full"
-                    initial={{ rotate: 0 }}
-                    animate={{ rotate: -compassHeading }}
-                    transition={{ type: "spring", stiffness: 100 }}
-                  >
-                    {/* Compass dial with cardinal directions */}
-                    <div className="absolute inset-0 rounded-full bg-gradient-to-b from-slate-800 to-slate-900 border-4 border-slate-700/50 shadow-lg">
-                      <div className="absolute w-1 h-8 bg-white top-0 left-1/2 -translate-x-1/2"></div>
-                      <div className="absolute w-1 h-8 bg-slate-600 bottom-0 left-1/2 -translate-x-1/2"></div>
-                      <div className="absolute h-1 w-8 bg-slate-600 left-0 top-1/2 -translate-y-1/2"></div>
-                      <div className="absolute h-1 w-8 bg-slate-600 right-0 top-1/2 -translate-y-1/2"></div>
-                      
-                      {/* Cardinal directions */}
-                      <div className="absolute top-8 left-1/2 -translate-x-1/2 text-white font-bold">N</div>
-                      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 text-slate-400">S</div>
-                      <div className="absolute left-8 top-1/2 -translate-y-1/2 text-slate-400">W</div>
-                      <div className="absolute right-8 top-1/2 -translate-y-1/2 text-slate-400">E</div>
-                      
-                      {/* Qibla marker */}
-                      <div 
-                        className="absolute w-1 h-12 bg-amber-500 opacity-75"
-                        style={{ 
-                          transform: `rotate(${qiblaDirection}deg) translateY(-90px)`,
-                          transformOrigin: 'center 132px',
-                          left: 'calc(50% - 0.5px)'
-                        }}
-                      >
-                        <div className="w-5 h-5 bg-amber-500 rounded-full absolute -top-3 left-1/2 -translate-x-1/2"></div>
-                      </div>
-                      
-                      {/* Center dot */}
-                      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-4 h-4 bg-slate-200 rounded-full"></div>
+              <div className="relative w-64 h-64 mb-8">
+                <motion.div 
+                  className="w-full h-full"
+                  initial={{ rotate: 0 }}
+                  animate={{ rotate: -compassHeading }}
+                  transition={{ type: "spring", stiffness: 100 }}
+                >
+                  {/* Compass dial with cardinal directions */}
+                  <div className="absolute inset-0 rounded-full bg-gradient-to-b from-slate-800 to-slate-900 border-4 border-slate-700/50 shadow-lg">
+                    <div className="absolute w-1 h-8 bg-white top-0 left-1/2 -translate-x-1/2"></div>
+                    <div className="absolute w-1 h-8 bg-slate-600 bottom-0 left-1/2 -translate-x-1/2"></div>
+                    <div className="absolute h-1 w-8 bg-slate-600 left-0 top-1/2 -translate-y-1/2"></div>
+                    <div className="absolute h-1 w-8 bg-slate-600 right-0 top-1/2 -translate-y-1/2"></div>
+                    
+                    {/* Cardinal directions */}
+                    <div className="absolute top-8 left-1/2 -translate-x-1/2 text-white font-bold">N</div>
+                    <div className="absolute bottom-8 left-1/2 -translate-x-1/2 text-slate-400">S</div>
+                    <div className="absolute left-8 top-1/2 -translate-y-1/2 text-slate-400">W</div>
+                    <div className="absolute right-8 top-1/2 -translate-y-1/2 text-slate-400">E</div>
+                    
+                    {/* Qibla marker */}
+                    <div 
+                      className="absolute w-1 h-12 bg-amber-500 opacity-75"
+                      style={{ 
+                        transform: `rotate(${qiblaDirection}deg) translateY(-90px)`,
+                        transformOrigin: 'center 132px',
+                        left: 'calc(50% - 0.5px)'
+                      }}
+                    >
+                      <div className="w-5 h-5 bg-amber-500 rounded-full absolute -top-3 left-1/2 -translate-x-1/2"></div>
                     </div>
-                  </motion.div>
-                  
-                  {/* Static Kaaba icon in center */}
-                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-10 w-16 h-16 flex items-center justify-center">
-                    <div className="w-14 h-14 bg-black rounded-md border-2 border-amber-600 flex items-center justify-center">
-                      <span className="text-amber-500 text-xs font-arabic">الكعبة</span>
-                    </div>
+                    
+                    {/* Center dot */}
+                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-4 h-4 bg-slate-200 rounded-full"></div>
+                  </div>
+                </motion.div>
+                
+                {/* Static Kaaba icon in center */}
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-10 w-16 h-16 flex items-center justify-center">
+                  <div className="w-14 h-14 bg-black rounded-md border-2 border-amber-600 flex items-center justify-center">
+                    <span className="text-amber-500 text-xs font-arabic">الكعبة</span>
                   </div>
                 </div>
-                
-                <div className="text-center mb-4">
-                  <p className="text-amber-400 font-arabic text-xl font-semibold">
-                    {settings.language === "ar" 
-                      ? `اتجاه القبلة: ${getDirectionName(qiblaDirection)}`
-                      : `Qibla: ${getDirectionName(qiblaDirection)}`}
-                  </p>
-                  <p className="text-white/60 font-arabic mt-2">
-                    {settings.language === "ar" 
-                      ? `${Math.round(qiblaDirection)}° من الشمال`
-                      : `${Math.round(qiblaDirection)}° from North`}
-                  </p>
-                </div>
-                
-                <div className="text-center text-white/70">
-                  <p className="text-sm font-arabic">
-                    {settings.language === "ar" 
-                      ? `اتجاه البوصلة: ${Math.round(compassHeading)}°`
-                      : `Compass heading: ${Math.round(compassHeading)}°`}
-                  </p>
-                </div>
-              </>
+              </div>
+              
+              <div className="text-center mb-4">
+                <p className="text-amber-400 font-arabic text-xl font-semibold">
+                  {settings.language === "ar" 
+                    ? `اتجاه القبلة: ${getDirectionName(qiblaDirection)}`
+                    : `Qibla: ${getDirectionName(qiblaDirection)}`}
+                </p>
+                <p className="text-white/60 font-arabic mt-2">
+                  {settings.language === "ar" 
+                    ? `${Math.round(qiblaDirection)}° من الشمال`
+                    : `${Math.round(qiblaDirection)}° from North`}
+                </p>
+              </div>
+              
+              <div className="text-center text-white/70">
+                <p className="text-sm font-arabic">
+                  {settings.language === "ar" 
+                    ? `اتجاه البوصلة: ${Math.round(compassHeading)}°`
+                    : `Compass heading: ${Math.round(compassHeading)}°`}
+                </p>
+              </div>
             ) : (
               <div className="text-center">
                 <Compass className="w-24 h-24 mx-auto text-amber-400 mb-6" />
