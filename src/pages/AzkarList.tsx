@@ -4,7 +4,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { azkarItems, azkarCategories } from "../data/azkarData";
 import { useToast } from "@/hooks/use-toast";
-import { ChevronLeft, ChevronRight, List, Share, Heart } from "lucide-react";
+import { ChevronLeft, ChevronRight, List, Share2, Heart } from "lucide-react";
 import { useAppSettings } from "../contexts/AppSettingsContext";
 
 const AzkarList = () => {
@@ -217,7 +217,7 @@ const AzkarList = () => {
               onClick={shareAzkar}
               className="text-white"
             >
-              <Share className="h-6 w-6" />
+              <Share2 className="h-6 w-6" />
             </button>
             
             <button

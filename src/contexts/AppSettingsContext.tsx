@@ -162,6 +162,16 @@ export const AppSettingsProvider: React.FC<{ children: ReactNode }> = ({ childre
       ...prev,
       notifications: { ...prev.notifications, ...notificationData }
     }));
+    
+    // Show toast for notification settings update
+    if (notificationData.enabled !== undefined) {
+      toast({
+        title: settings.language === "ar" 
+          ? notificationData.enabled ? "تم تفعيل الإشعارات" : "تم إيقاف الإشعارات"
+          : notificationData.enabled ? "Notifications enabled" : "Notifications disabled",
+        description: ""
+      });
+    }
   };
   
   const updateAppearanceSettings = (appearanceData: Partial<AppSettings["appearance"]>) => {
@@ -192,6 +202,19 @@ export const AppSettingsProvider: React.FC<{ children: ReactNode }> = ({ childre
         ? "تم تغيير لغة التطبيق إلى العربية"
         : "App language changed to English"
     });
+    
+    // Refresh prayer times based on new language setting
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const { latitude, longitude } = position.coords;
+          getCityNameFromCoordinates(latitude, longitude);
+        },
+        (error) => {
+          console.log("Error refreshing location after language change:", error);
+        }
+      );
+    }
   };
   
   const toggleDarkMode = () => {

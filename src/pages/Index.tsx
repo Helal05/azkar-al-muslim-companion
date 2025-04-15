@@ -197,17 +197,6 @@ const Index = () => {
 
   // Get the next prayer that's highlighted
   const nextPrayer = prayerTimes.find(prayer => prayer.isNext);
-  
-  // Handle adding to favorites
-  const handleAddToFavorites = (duaId: string) => {
-    // In a real implementation, this would save to a favorites store
-    toast({
-      title: settings.language === "ar" ? "تمت الإضافة للمفضلة" : "Added to favorites",
-      description: settings.language === "ar" 
-        ? "تمت إضافة الدعاء إلى المفضلة"
-        : "This dua has been added to your favorites"
-    });
-  };
 
   return (
     <div className={`flex flex-col min-h-screen ${settings.appearance.darkMode ? "bg-gradient-to-b from-slate-900 to-slate-950 text-white" : "bg-gradient-to-b from-amber-50 to-amber-100 text-slate-900"}`}>
@@ -241,12 +230,6 @@ const Index = () => {
             </button>
             <button onClick={() => navigate("/settings")} className="p-1.5 rounded-full bg-white/10 backdrop-blur-sm">
               <Settings className="h-5 w-5 text-white/80 hover:text-white transition-colors" />
-            </button>
-            <button onClick={toggleDarkMode} className="p-1.5 rounded-full bg-white/10 backdrop-blur-sm">
-              {settings.appearance.darkMode ? 
-                <Sun className="h-5 w-5 text-white/80 hover:text-white transition-colors" /> :
-                <Moon className="h-5 w-5 text-white/80 hover:text-white transition-colors" />
-              }
             </button>
           </div>
         </div>
@@ -284,15 +267,15 @@ const Index = () => {
       </div>
 
       {/* Date & Prayer Time Info */}
-      <div className={`${settings.appearance.darkMode ? "bg-slate-800/80" : "bg-white/80"} border-t border-b ${settings.appearance.darkMode ? "border-white/10" : "border-amber-200/50"} backdrop-blur-md`}>
+      <div className={`${settings.appearance.darkMode ? "bg-slate-800/80" : "bg-slate-700/80"} border-t border-b ${settings.appearance.darkMode ? "border-white/10" : "border-amber-200/50"} backdrop-blur-md`}>
         {/* Islamic Date Display */}
         <div className="flex items-center justify-between px-4 py-2.5">
           <div className="flex items-center text-xs text-white/70">
-            <Calendar className={`h-3.5 w-3.5 ml-1 rtl:mr-1 ${settings.appearance.darkMode ? "text-white/70" : "text-slate-600"}`} />
-            <span className={settings.appearance.darkMode ? "text-white/70" : "text-slate-600"}>{islamicDate.gregorianDate}</span>
+            <Calendar className="h-3.5 w-3.5 ml-1 rtl:mr-1 text-white/70" />
+            <span className="text-white/70">{islamicDate.gregorianDate}</span>
           </div>
           
-          <div className={`text-sm font-arabic font-semibold ${settings.appearance.darkMode ? "text-amber-400/90" : "text-amber-600"}`}>
+          <div className="text-sm font-arabic font-semibold text-amber-400/90">
             {islamicDate.day} {islamicDate.month} {islamicDate.year}هـ
           </div>
           
@@ -300,46 +283,46 @@ const Index = () => {
             onClick={() => requestLocationPermission()}
             className="flex items-center text-xs hover:bg-slate-700/20 p-1 rounded transition-colors"
           >
-            <MapPin className={`h-3.5 w-3.5 ml-1 rtl:mr-1 ${settings.appearance.darkMode ? "text-white/70" : "text-slate-600"}`} />
-            <span className={settings.appearance.darkMode ? "text-white/70" : "text-slate-600"}>{settings.location.city}</span>
+            <MapPin className="h-3.5 w-3.5 ml-1 rtl:mr-1 text-white/70" />
+            <span className="text-white/70">{settings.location.city}</span>
           </button>
         </div>
         
         {/* Next Prayer Time */}
-        <div className={`border-t ${settings.appearance.darkMode ? "border-white/5" : "border-amber-200/30"} px-4 py-3 flex justify-between items-center`}>
+        <div className="border-t border-white/5 px-4 py-3 flex justify-between items-center">
           <div className="flex flex-col items-center">
-            <p className={`text-xs mb-1 ${settings.appearance.darkMode ? "text-white/70" : "text-slate-600"}`}>
+            <p className="text-xs mb-1 text-white/70">
               {settings.language === "ar" ? "متبقي للصلاة" : "Time remaining"}
             </p>
             <div className="flex items-center">
-              <Clock className={`h-3.5 w-3.5 ml-1 ${settings.appearance.darkMode ? "text-white/70" : "text-slate-600"}`} />
-              <p className={settings.appearance.darkMode ? "text-white font-semibold" : "text-slate-800 font-semibold"}>{nextPrayerTime}</p>
+              <Clock className="h-3.5 w-3.5 ml-1 text-white/70" />
+              <p className="text-white font-semibold">{nextPrayerTime}</p>
             </div>
           </div>
           
           <div className="flex flex-col items-center">
-            <p className={`text-xs mb-1 ${settings.appearance.darkMode ? "text-white/70" : "text-slate-600"}`}>
+            <p className="text-xs mb-1 text-white/70">
               {settings.language === "ar" ? "الصلاة القادمة" : "Next prayer"}
             </p>
-            <p className={`font-arabic font-semibold ${settings.appearance.darkMode ? "text-amber-400" : "text-amber-600"}`}>{nextPrayer?.name}</p>
+            <p className="font-arabic font-semibold text-amber-400">{nextPrayer?.name}</p>
           </div>
           
           <div className="flex flex-col items-center">
-            <p className={`text-xs mb-1 ${settings.appearance.darkMode ? "text-white/70" : "text-slate-600"}`}>
+            <p className="text-xs mb-1 text-white/70">
               {settings.language === "ar" ? "وقت الصلاة" : "Prayer time"}
             </p>
-            <p className={`font-semibold font-arabic ${settings.appearance.darkMode ? "text-white" : "text-slate-800"}`}>{nextPrayer?.time}</p>
+            <p className="font-semibold font-arabic text-white">{nextPrayer?.time}</p>
           </div>
         </div>
       </div>
 
       {/* Bottom Navigation */}
-      <div className={`${settings.appearance.darkMode ? "bg-slate-900/90" : "bg-white/90"} py-2.5 flex justify-around border-b ${settings.appearance.darkMode ? "border-white/5" : "border-amber-200/30"} backdrop-blur-md`}>
+      <div className="bg-slate-900/90 py-2.5 flex justify-around border-b border-white/5 backdrop-blur-md">
         <button 
           onClick={() => navigate("/more")}
           className="flex flex-col items-center text-xs"
         >
-          <span className={`font-arabic ${settings.appearance.darkMode ? "text-gray-400" : "text-slate-600"}`}>
+          <span className="font-arabic text-gray-400">
             {settings.language === "ar" ? "المنوعة" : "Misc"}
           </span>
         </button>
@@ -347,7 +330,7 @@ const Index = () => {
           onClick={() => navigate("/favorites")}
           className="flex flex-col items-center text-xs"
         >
-          <span className={`font-arabic ${settings.appearance.darkMode ? "text-gray-400" : "text-slate-600"}`}>
+          <span className="font-arabic text-gray-400">
             {settings.language === "ar" ? "المفضلة" : "Favorites"}
           </span>
         </button>
@@ -355,7 +338,7 @@ const Index = () => {
           onClick={() => navigate("/qibla")}
           className="flex flex-col items-center text-xs"
         >
-          <span className={`font-arabic ${settings.appearance.darkMode ? "text-gray-400" : "text-slate-600"}`}>
+          <span className="font-arabic text-gray-400">
             {settings.language === "ar" ? "القبلة" : "Qibla"}
           </span>
         </button>
@@ -363,7 +346,7 @@ const Index = () => {
           onClick={() => navigate("/prayer-times")}
           className="flex flex-col items-center text-xs"
         >
-          <span className={`font-arabic ${settings.appearance.darkMode ? "text-gray-400" : "text-slate-600"}`}>
+          <span className="font-arabic text-gray-400">
             {settings.language === "ar" ? "الصلاة" : "Prayer"}
           </span>
         </button>
@@ -371,7 +354,7 @@ const Index = () => {
           onClick={() => navigate("/tasbih")}
           className="flex flex-col items-center text-xs"
         >
-          <span className={`font-arabic ${settings.appearance.darkMode ? "text-gray-400" : "text-slate-600"}`}>
+          <span className="font-arabic text-gray-400">
             {settings.language === "ar" ? "العداد" : "Counter"}
           </span>
         </button>
@@ -381,7 +364,7 @@ const Index = () => {
       <div className="flex-1 py-5 px-3">
         {/* Night Dua Card */}
         <div className="mb-5">
-          <NightDuas onAddToFavorites={handleAddToFavorites} />
+          <NightDuas />
         </div>
         
         {/* Categories Grid */}
@@ -395,22 +378,6 @@ const Index = () => {
               <span className={`text-lg ${item.textColor} font-arabic`}>{item.title}</span>
             </button>
           ))}
-        </div>
-        
-        {/* Share App Button */}
-        <div className="mt-6">
-          <button
-            onClick={shareApp}
-            className={`flex items-center justify-center w-full py-3 px-4 rounded-lg ${
-              settings.appearance.darkMode 
-                ? "bg-gradient-to-br from-amber-900/20 to-amber-800/5 border border-amber-700/30" 
-                : "bg-gradient-to-br from-amber-500/20 to-amber-400/10 border border-amber-400/50"
-            }`}
-          >
-            <span className={`font-arabic ${settings.appearance.darkMode ? "text-amber-400" : "text-amber-600"}`}>
-              {settings.language === "ar" ? "مشاركة التطبيق" : "Share App"}
-            </span>
-          </button>
         </div>
       </div>
     </div>

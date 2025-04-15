@@ -2,7 +2,8 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAppSettings } from "../contexts/AppSettingsContext";
-import { Moon, ChevronRight } from 'lucide-react';
+import { Moon, ChevronRight, Heart } from 'lucide-react';
+import { useToast } from "@/hooks/use-toast";
 
 interface NightDua {
   id: string;
@@ -47,6 +48,7 @@ const nightDuas: NightDua[] = [
 export const NightDuas: React.FC = () => {
   const navigate = useNavigate();
   const { settings } = useAppSettings();
+  const { toast } = useToast();
   const isArabic = settings.language === "ar";
   
   const getRandomDua = (): NightDua => {
@@ -55,6 +57,10 @@ export const NightDuas: React.FC = () => {
   };
   
   const [currentDua, setCurrentDua] = React.useState<NightDua>(getRandomDua());
+  const [favorites, setFavorites] = React.useState<string[]>(() => {
+    const savedFavorites = localStorage.getItem("azkar-favorites");
+    return savedFavorites ? JSON.parse(savedFavorites) : [];
+  });
   
   const changeDua = () => {
     let newDua = getRandomDua();
@@ -64,6 +70,32 @@ export const NightDuas: React.FC = () => {
     }
     setCurrentDua(newDua);
   };
+  
+  const toggleFavorite = () => {
+    const isCurrentFavorite = favorites.includes(currentDua.id);
+    
+    if (isCurrentFavorite) {
+      setFavorites(favorites.filter(id => id !== currentDua.id));
+      toast({
+        title: settings.language === "ar" ? "تمت الإزالة من المفضلة" : "Removed from favorites",
+        description: ""
+      });
+    } else {
+      setFavorites([...favorites, currentDua.id]);
+      toast({
+        title: settings.language === "ar" ? "تمت الإضافة للمفضلة" : "Added to favorites",
+        description: ""
+      });
+    }
+    
+    localStorage.setItem("azkar-favorites", JSON.stringify(
+      isCurrentFavorite 
+        ? favorites.filter(id => id !== currentDua.id)
+        : [...favorites, currentDua.id]
+    ));
+  };
+  
+  const isCurrentFavorite = favorites.includes(currentDua.id);
   
   return (
     <div className="relative min-h-[200px] bg-gradient-to-br from-slate-900 to-indigo-900 border border-indigo-800/30 p-4 rounded-xl overflow-hidden">
@@ -78,7 +110,14 @@ export const NightDuas: React.FC = () => {
         </h3>
       </div>
       
-      <div className="absolute bottom-3 right-3 z-10">
+      <div className="flex justify-around absolute bottom-3 right-3 z-10">
+        <button 
+          onClick={toggleFavorite}
+          className="flex items-center text-xs text-indigo-300 hover:text-indigo-200 mr-4"
+        >
+          <Heart className={`w-4 h-4 ${isCurrentFavorite ? 'fill-indigo-300 text-indigo-300' : 'text-indigo-300'}`} />
+        </button>
+        
         <button 
           onClick={() => navigate("/category/night-duas")}
           className="flex items-center text-xs text-indigo-300 hover:text-indigo-200"

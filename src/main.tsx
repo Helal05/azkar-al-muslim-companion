@@ -18,12 +18,23 @@ if (savedTheme) {
     if (settings.appearance && settings.appearance.fontSize) {
       document.documentElement.style.fontSize = `${settings.appearance.fontSize}%`;
     }
+    
+    // Apply RTL direction based on language
+    if (settings.language === "ar") {
+      document.documentElement.dir = "rtl";
+    } else {
+      document.documentElement.dir = "ltr";
+    }
   } catch (error) {
     console.error("Error parsing saved theme:", error);
+    // Default to dark mode and RTL (Arabic) direction
+    document.documentElement.classList.add("dark");
+    document.documentElement.dir = "rtl";
   }
 } else {
-  // Default to dark mode
+  // Default to dark mode and RTL (Arabic) direction
   document.documentElement.classList.add("dark");
+  document.documentElement.dir = "rtl";
 }
 
 createRoot(document.getElementById("root")!).render(<App />);
