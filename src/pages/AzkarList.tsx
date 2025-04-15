@@ -67,7 +67,8 @@ const AzkarList = () => {
   }
   
   const currentAzkar = categoryAzkar[currentIndex];
-  const currentAzkarId = currentAzkar.id;
+  // Convert id to string to ensure type safety
+  const currentAzkarId = String(currentAzkar.id);
   const isCurrentFavorite = favorites.includes(currentAzkarId);
   
   const decrementCounter = () => {
