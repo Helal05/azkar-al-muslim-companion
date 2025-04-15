@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
@@ -72,7 +71,8 @@ const AzkarList = () => {
   }
   
   const currentAzkar = categoryAzkar[currentIndex];
-  const isCurrentFavorite = favorites.includes(currentAzkar.id);
+  const currentAzkarId = String(currentAzkar.id);
+  const isCurrentFavorite = favorites.includes(currentAzkarId);
   
   const decrementCounter = () => {
     if (counter > 0) {
@@ -111,14 +111,16 @@ const AzkarList = () => {
   };
   
   const toggleFavorite = () => {
+    const azkarId = String(currentAzkar.id);
+    
     if (isCurrentFavorite) {
-      setFavorites(favorites.filter(id => id !== currentAzkar.id));
+      setFavorites(favorites.filter(id => id !== azkarId));
       toast({
         title: settings.language === "ar" ? "تمت الإزالة من المفضلة" : "Removed from favorites",
         description: "",
       });
     } else {
-      setFavorites([...favorites, currentAzkar.id]);
+      setFavorites([...favorites, azkarId]);
       toast({
         title: settings.language === "ar" ? "تمت الإضافة للمفضلة" : "Added to favorites",
         description: "",

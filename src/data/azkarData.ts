@@ -1,5 +1,5 @@
 export interface AzkarItem {
-  id: number;
+  id: string | number;
   category: string;
   arabic: string;
   count: number;
@@ -25,6 +25,7 @@ export const azkarCategories: AzkarCategory[] = [
   {
     id: "morning",
     name: "أذكار الصباح",
+    nameEn: "Morning Adhkar",
     icon: "🌞",
     description: "الأذكار التي تقال في الصباح",
     color: "bg-gradient-to-r from-cyan-500 to-blue-500",
@@ -34,6 +35,7 @@ export const azkarCategories: AzkarCategory[] = [
   {
     id: "evening",
     name: "أذكار المساء",
+    nameEn: "Evening Adhkar",
     icon: "🌙",
     description: "الأذكار التي تقال في المساء",
     color: "bg-gradient-to-r from-purple-500 to-pink-500",
@@ -43,6 +45,7 @@ export const azkarCategories: AzkarCategory[] = [
   {
     id: "prayer",
     name: "أذكار الصلاة",
+    nameEn: "Prayer Adhkar",
     icon: "🕌",
     description: "الأذكار التي تقال أثناء الصلاة",
     color: "bg-gradient-to-r from-amber-500 to-orange-500",
@@ -52,6 +55,7 @@ export const azkarCategories: AzkarCategory[] = [
   {
     id: "afterPrayer",
     name: "أذكار بعد الصلاة",
+    nameEn: "After Prayer Adhkar",
     icon: "📿",
     description: "الأذكار التي تقال بعد الصلاة",
     color: "bg-gradient-to-r from-blue-500 to-indigo-500",
@@ -61,6 +65,7 @@ export const azkarCategories: AzkarCategory[] = [
   {
     id: "sleep",
     name: "أذكار النوم",
+    nameEn: "Sleep Adhkar",
     icon: "🛌",
     description: "الأذكار التي تقال قبل النوم",
     color: "bg-gradient-to-r from-violet-500 to-purple-500",
@@ -70,6 +75,7 @@ export const azkarCategories: AzkarCategory[] = [
   {
     id: "wakeup",
     name: "أذكار الاستيقاظ",
+    nameEn: "Wakeup Adhkar",
     icon: "⏰",
     description: "الأذكار التي تقال عند الاستيقاظ",
     color: "bg-gradient-to-r from-yellow-500 to-amber-500",
@@ -79,6 +85,7 @@ export const azkarCategories: AzkarCategory[] = [
   {
     id: "quran",
     name: "أدعية من القرآن",
+    nameEn: "Duas from Quran",
     icon: "📖",
     description: "أدعية مختارة من القرآن الكريم",
     color: "bg-gradient-to-r from-emerald-500 to-teal-500",
@@ -88,6 +95,7 @@ export const azkarCategories: AzkarCategory[] = [
   {
     id: "prophet",
     name: "من دعاء الرسول ﷺ",
+    nameEn: "Prophet's Duas",
     icon: "🤲",
     description: "أدعية مأثورة عن النبي ﷺ",
     color: "bg-gradient-to-r from-amber-500 to-yellow-500",
@@ -97,6 +105,7 @@ export const azkarCategories: AzkarCategory[] = [
   {
     id: "ruqyah",
     name: "الرقية بالقرآن",
+    nameEn: "Ruqyah from Quran",
     icon: "🌿",
     description: "آيات الرقية الشرعية من القرآن",
     color: "bg-gradient-to-r from-teal-500 to-cyan-500",
@@ -106,6 +115,7 @@ export const azkarCategories: AzkarCategory[] = [
   {
     id: "ruqyahSunnah",
     name: "الرقية بالسنة",
+    nameEn: "Ruqyah from Sunnah",
     icon: "🌱",
     description: "أدعية الرقية الشرعية من السنة",
     color: "bg-gradient-to-r from-green-500 to-emerald-500",
@@ -115,6 +125,7 @@ export const azkarCategories: AzkarCategory[] = [
   {
     id: "tasbih",
     name: "تسابيح",
+    nameEn: "Tasbeeh",
     icon: "🧿",
     description: "تسابيح وأذكار عامة",
     color: "bg-gradient-to-r from-cyan-500 to-sky-500",
@@ -124,6 +135,7 @@ export const azkarCategories: AzkarCategory[] = [
   {
     id: "names",
     name: "أسماء الله الحسنى",
+    nameEn: "Names of Allah",
     icon: "✨",
     description: "أسماء الله الحسنى وفضائلها",
     color: "bg-gradient-to-r from-rose-500 to-red-500",
@@ -133,6 +145,7 @@ export const azkarCategories: AzkarCategory[] = [
   {
     id: "more",
     name: "المزيد",
+    nameEn: "More",
     icon: "➕",
     description: "المزيد من الأذكار والأدعية",
     color: "bg-gradient-to-r from-lime-500 to-green-500",
@@ -144,7 +157,8 @@ export const azkarCategories: AzkarCategory[] = [
     name: "دعاء من تعار من الليل",
     nameEn: "Night Duas",
     description: "أدعية الاستيقاظ في الليل",
-    icon: "moon"
+    icon: "moon",
+    items: []
   }
 ];
 
@@ -188,7 +202,7 @@ export const azkarItems: AzkarItem[] = [
   {
     id: 5,
     category: "morning",
-    arabic: "أَصْبَحْنَا وَأَصْبَحَ الْمُلْكُ لِلَّهِ، وَالْحَمْدُ لِلَّهِ، لَا إِلَهَ إِلَّا اللهُ وَحْدَهُ لَا شَرِيكَ لَهُ، لَهُ الْمُلْكُ وَلَهُ الْحَمْدُ وَهُوَ عَلَى كُلِّ شَيْءٍ قَدِيرٌ. رَبِّ أَسْأَلُكَ خَيْرَ مَا فِي هَذَا الْيَوْمِ وَخَيْرَ مَا بَعْدَهُ، وَأَعُوذُ بِكَ مِنْ شَرِّ مَا فِي هَذَا الْيَوْمِ وَشَرِّ مَا بَعْدَهُ، رَبِّ أَعُوذُ بِكَ مِنَ الْكَسَلِ وَسُوءِ الْكِبَرِ، رَبِّ أَعُوذُ بِكَ مِنْ عَذَابٍ فِي النَّارِ وَعَذَابٍ فِي الْقَبْرِ",
+    arabic: "أَصْبَحْنَا وَأَصْبَحَ الْمُلْكُ لِلَّهِ، وَالْحَمْدُ لِلَّهِ، لَا إِلَهَ إِلَّا اللهُ وَحْدَهُ لَا شَرِيكَ لَهُ، لَهُ الْمُلْكُ وَلَهُ الْحَمْدُ وَهُوَ عَلَى كُلِّ شَيْءٍ قَدِيرٌ. رَبِّ أَسْأَلُكَ خَيْرَ مَا فِي هَذَا الْيَوْمِ وَخَيْرَ مَا بَعْدَهُ، وَأَعُوذُ بِكَ مِنْ شَرِّ مَا فِي هَذَا الْيَوْمِ وَشَرِّ مَا بَعْدَهُ، رَبِّ أَعُوذُ بِكَ مِنَ الْكَسَلِ وَسُوءِ الْكِبَرِ، رَبِّ أَعُوذُ بِكَ مِنْ عَذَابٍ فِي النَّارِ وَعَذَابٍ فِي الْق��بْرِ",
     count: 1,
     reference: "رواه مسلم",
     benefit: "من الأذكار المستحبة في الصباح"
@@ -429,7 +443,7 @@ export const azkarItems: AzkarItem[] = [
     category: "night-duas",
     arabic: "اللَّهُمَّ عَافِنِي فِي بَدَنِي، اللَّهُمَّ عَافِنِي فِي سَمْعِي، اللَّهُمَّ عَافِنِي فِي بَصَرِي، لَا إِلَهَ إِلَّا أَنْتَ.",
     count: 1,
-    benefit: "دعاء للعافية في البدن والسمع والبصر",
+    benefit: "دعاء للعافية في ا��بدن والسمع والبصر",
     reference: "أبو داود والترمذي"
   },
   {
