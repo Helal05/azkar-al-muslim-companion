@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { azkarCategories } from "../data/azkarData";
@@ -295,7 +294,7 @@ const Index = () => {
             onClick={() => requestLocationPermission()}
             className="flex items-center text-xs hover:bg-slate-700/20 p-1 rounded transition-colors"
           >
-            <MapPin className="h-3.5 w-3.5 ml-1 rtl:mr-1 text-white/70" />
+            <MapPin className="h-3.5 w-3.5 ml-1 text-white/70" />
             <span className="text-white/70">{settings.location.city}</span>
           </button>
         </div>

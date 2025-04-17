@@ -107,7 +107,8 @@ export const AppSettingsProvider: React.FC<{ children: ReactNode }> = ({ childre
         },
         (error) => {
           console.log("Error getting location:", error);
-        }
+        },
+        { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
       );
     }
   }, []);
@@ -186,6 +187,11 @@ export const AppSettingsProvider: React.FC<{ children: ReactNode }> = ({ childre
           : notificationData.enabled ? "Notifications enabled" : "Notifications disabled",
         description: ""
       });
+    }
+    
+    // Request notification permission if enabling notifications
+    if (notificationData.enabled && Notification.permission !== "granted") {
+      Notification.requestPermission();
     }
   };
   

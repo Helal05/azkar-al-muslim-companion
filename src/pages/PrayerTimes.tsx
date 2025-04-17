@@ -62,10 +62,11 @@ const PrayerTimes = () => {
   useEffect(() => {
     const interval = setInterval(() => {
       setNextPrayerTime(getTimeToNextPrayer(settings.language, true));
-    }, 1000); // Update every second for accurate countdown
+      setPrayerTimes(getPrayerTimes(settings.location.latitude, settings.location.longitude, settings.language));
+    }, 60000); // Update every minute for accurate countdown
 
     return () => clearInterval(interval);
-  }, [settings.language]);
+  }, [settings.language, settings.location]);
 
   // Calculate elapsed time since last prayer or time until next prayer
   const getElapsedOrRemainingTime = () => {
