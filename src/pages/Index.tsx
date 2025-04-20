@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import QuranVerse from "../components/QuranVerse";
 import { azkarCategories } from "../data/azkarData";
 import { quranVerses, naturalBackgrounds } from "../data/duaData";
 import { getCurrentIslamicDate, getPrayerTimes, getTimeToNextPrayer } from "../data/prayerData";
@@ -210,72 +211,10 @@ const Index = () => {
 
   return (
     <div className="flex flex-col min-h-screen bg-gradient-to-b from-slate-900 to-slate-950 text-white">
-      {/* Header with Islamic pattern overlay and Quran verse */}
-      <div 
-        className="relative w-full text-white py-6 px-4 overflow-hidden"
-        style={{
-          backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url(${islamicBackgrounds[backgroundIndex]})`,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center'
-        }}
-      >
-        {/* Islamic Pattern Overlay */}
-        <div 
-          className="absolute inset-0 opacity-15" 
-          style={{
-            backgroundImage: "url('/patterns/islamic-pattern.svg')",
-            backgroundSize: '300px',
-            backgroundRepeat: 'repeat'
-          }}
-        />
-        
-        {/* Top Navigation */}
-        <div className="flex justify-between items-center mb-6 relative z-10">
-          <button onClick={() => setShowSearch(!showSearch)}>
-            <Search className="h-6 w-6 text-white/80 hover:text-white transition-colors" />
-          </button>
-          <div className="flex space-x-3 rtl:space-x-reverse">
-            <button onClick={() => navigate("/favorites")} className="p-1.5 rounded-full bg-white/10 backdrop-blur-sm">
-              <Heart className="h-5 w-5 text-white/80 hover:text-white transition-colors" />
-            </button>
-            <button onClick={() => navigate("/settings")} className="p-1.5 rounded-full bg-white/10 backdrop-blur-sm">
-              <Settings className="h-5 w-5 text-white/80 hover:text-white transition-colors" />
-            </button>
-          </div>
-        </div>
-        
-        {/* Search Bar - Conditionally displayed */}
-        {showSearch && (
-          <div className="mb-4 relative z-10">
-            <form onSubmit={handleSearch} className="relative">
-              <input
-                type="text"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder={settings.language === "ar" ? "ابحث ..." : "Search..."}
-                className="w-full bg-white/10 backdrop-blur-md text-white rounded-lg py-2.5 px-4 font-arabic text-right border border-white/20 focus:outline-none focus:ring-2 focus:ring-white/30 focus:border-transparent"
-              />
-              <button
-                type="submit"
-                className="absolute left-2 top-1/2 transform -translate-y-1/2"
-              >
-                <Search className="h-5 w-5 text-white/60" />
-              </button>
-            </form>
-          </div>
-        )}
-        
-        {/* Quran verse */}
-        <div className="mt-6 mb-8 relative z-10">
-          <p className="text-white text-xl md:text-2xl font-arabic font-bold text-center leading-relaxed">
-            {quranVerses[currentVerse].verse}
-          </p>
-          <p className="text-white/70 text-xs text-center mt-2 font-arabic">
-            {quranVerses[currentVerse].surah}
-          </p>
-        </div>
-      </div>
-
+      {/* Header with QuranVerse component */}
+      <QuranVerse />
+      
+      {/* Keep the rest of the components */}
       {/* Date & Prayer Time Info */}
       <div className="bg-slate-800/80 border-t border-b border-white/10 backdrop-blur-md">
         {/* Islamic Date Display */}
