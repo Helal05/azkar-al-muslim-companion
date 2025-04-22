@@ -14,8 +14,8 @@ const Logo = ({ size = 'md' }: LogoProps) => {
 
   return (
     <div className="flex items-center gap-2">
-      <Shield className={`text-islamic-green ${size === 'sm' ? 'w-6 h-6' : size === 'md' ? 'w-8 h-8' : 'w-12 h-12'}`} />
-      <h1 className={`font-arabic ${sizes[size]} text-islamic-green font-bold`}>
+      <Shield className={`text-amber-500 ${size === 'sm' ? 'w-6 h-6' : size === 'md' ? 'w-8 h-8' : 'w-12 h-12'}`} />
+      <h1 className={`font-arabic ${sizes[size]} bg-gradient-to-r from-amber-500 to-amber-700 bg-clip-text text-transparent font-bold`}>
         حِصنُك
       </h1>
     </div>

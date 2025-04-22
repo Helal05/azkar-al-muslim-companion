@@ -1,3 +1,4 @@
+
 import { Settings, Moon, Sun } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
@@ -53,11 +54,14 @@ const Header = () => {
             <button 
               onClick={() => navigate("/")}
               className="p-2 rounded-full hover:bg-islamic-neutral/50 dark:hover:bg-islamic-green-dark/50 transition-colors"
+              aria-label="الرئيسية"
             >
               <Logo size="sm" />
             </button>
           ) : (
-            <Logo size="md" />
+            <div className="py-1">
+              <Logo size="md" />
+            </div>
           )}
         </div>
 
@@ -65,6 +69,7 @@ const Header = () => {
           <button 
             onClick={toggleDarkMode}
             className="p-2 rounded-full hover:bg-islamic-neutral/50 dark:hover:bg-islamic-green-dark/50 transition-colors"
+            aria-label={isDarkMode ? "وضع النهار" : "وضع الليل"}
           >
             {isDarkMode ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
           </button>
@@ -72,6 +77,7 @@ const Header = () => {
           <button 
             onClick={() => navigate("/settings")}
             className="p-2 rounded-full hover:bg-islamic-neutral/50 dark:hover:bg-islamic-green-dark/50 transition-colors"
+            aria-label="الإعدادات"
           >
             <Settings className="w-5 h-5" />
           </button>
