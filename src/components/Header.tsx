@@ -1,7 +1,7 @@
-
-import { Home, Settings, Moon, Sun } from "lucide-react";
+import { Settings, Moon, Sun } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
+import Logo from "./Logo";
 
 const Header = () => {
   const [isDarkMode, setIsDarkMode] = useState(false);
@@ -49,20 +49,18 @@ const Header = () => {
     <header className="bg-white dark:bg-islamic-green-dark/40 shadow-sm sticky top-0 z-10 backdrop-blur-md bg-opacity-80 dark:bg-opacity-80">
       <div className="container mx-auto px-4 py-3 flex items-center justify-between">
         <div className="flex items-center space-x-2 rtl:space-x-reverse">
-          {location.pathname !== "/" && (
+          {location.pathname !== "/" ? (
             <button 
               onClick={() => navigate("/")}
               className="p-2 rounded-full hover:bg-islamic-neutral/50 dark:hover:bg-islamic-green-dark/50 transition-colors"
             >
-              <Home className="w-5 h-5" />
+              <Logo size="sm" />
             </button>
+          ) : (
+            <Logo size="md" />
           )}
         </div>
-        
-        <h1 className="text-xl font-arabic font-bold text-islamic-green-dark dark:text-islamic-neutral">
-          {getTitle()}
-        </h1>
-        
+
         <div className="flex items-center space-x-3 rtl:space-x-reverse">
           <button 
             onClick={toggleDarkMode}
