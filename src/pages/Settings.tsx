@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
@@ -6,7 +5,7 @@ import {
   Bell, BellOff, Volume, VolumeOff, ChevronLeft, Calendar, 
   Moon, Sun, MapPin, Vibrate, Share2, Globe, PlusCircle, 
   MinusCircle, Languages, Users, X, ExternalLink, Mail,
-  Star, MessageSquare, BookOpen, Info
+  Star, MessageSquare, BookOpen, Info, ChevronRight
 } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { useAppSettings } from "../contexts/AppSettingsContext";
@@ -227,7 +226,7 @@ const Settings = () => {
           {/* Notifications */}
           <div 
             className="bg-slate-800/50 backdrop-blur-sm rounded-xl border border-white/10 p-4 mb-3 flex items-center justify-between"
-            onClick={() => toggleSection('notifications')}
+            onClick={() => navigate("/notifications")}
           >
             <div className="flex items-center space-x-3 rtl:space-x-reverse">
               <div>
@@ -240,112 +239,6 @@ const Settings = () => {
               <Bell className="w-6 h-6 text-white" />
             </div>
           </div>
-          
-          {activeSection === 'notifications' && (
-            <div className="mb-4 bg-slate-800/30 backdrop-blur-sm rounded-xl border border-white/5 p-4">
-              {/* Notifications Toggle */}
-              <div className="flex items-center justify-between mb-4">
-                <div className="flex items-center space-x-3 rtl:space-x-reverse">
-                  {settings.notifications.enabled ? (
-                    <Bell className="w-5 h-5 text-amber-400" />
-                  ) : (
-                    <BellOff className="w-5 h-5 text-white/50" />
-                  )}
-                  <div>
-                    <h3 className="font-arabic text-base text-white">
-                      {t('notifications')}
-                    </h3>
-                    <p className="text-sm text-white/50">
-                      {t('reminderForAzkar')}
-                    </p>
-                  </div>
-                </div>
-                <Switch 
-                  checked={settings.notifications.enabled} 
-                  onCheckedChange={(checked) => {
-                    if (checked) {
-                      requestNotificationPermission();
-                    } else {
-                      updateNotificationSettings({ enabled: false });
-                    }
-                  }}
-                  className="data-[state=checked]:bg-amber-600"
-                />
-              </div>
-              
-              {/* Prayer Notifications */}
-              <div className="flex items-center justify-between mb-4">
-                <div className="flex items-center space-x-3 rtl:space-x-reverse">
-                  {settings.notifications.prayerReminders ? (
-                    <Calendar className="w-5 h-5 text-amber-400" />
-                  ) : (
-                    <Calendar className="w-5 h-5 text-white/50" />
-                  )}
-                  <div>
-                    <h3 className="font-arabic text-base text-white">
-                      {settings.language === "ar" ? "تنبيهات الصلاة" : "Prayer Reminders"}
-                    </h3>
-                    <p className="text-sm text-white/50">
-                      {settings.language === "ar" ? "تفعيل تنبيهات أوقات الصلاة" : "Enable prayer time alerts"}
-                    </p>
-                  </div>
-                </div>
-                <Switch 
-                  checked={settings.notifications.prayerReminders} 
-                  onCheckedChange={(checked) => updateNotificationSettings({ prayerReminders: checked })}
-                  className="data-[state=checked]:bg-amber-600"
-                />
-              </div>
-              
-              {/* Azkar Notifications */}
-              <div className="flex items-center justify-between mb-4">
-                <div className="flex items-center space-x-3 rtl:space-x-reverse">
-                  {settings.notifications.azkarReminders ? (
-                    <BookOpen className="w-5 h-5 text-amber-400" />
-                  ) : (
-                    <BookOpen className="w-5 h-5 text-white/50" />
-                  )}
-                  <div>
-                    <h3 className="font-arabic text-base text-white">
-                      {settings.language === "ar" ? "تنبيهات الأذكار" : "Azkar Reminders"}
-                    </h3>
-                    <p className="text-sm text-white/50">
-                      {settings.language === "ar" ? "تفعيل تنبيهات الأذكار" : "Enable azkar reminders"}
-                    </p>
-                  </div>
-                </div>
-                <Switch 
-                  checked={settings.notifications.azkarReminders} 
-                  onCheckedChange={(checked) => updateNotificationSettings({ azkarReminders: checked })}
-                  className="data-[state=checked]:bg-amber-600"
-                />
-              </div>
-              
-              {/* Sound */}
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-3 rtl:space-x-reverse">
-                  {settings.notifications.adhanSound ? (
-                    <Volume className="w-5 h-5 text-amber-400" />
-                  ) : (
-                    <VolumeOff className="w-5 h-5 text-white/50" />
-                  )}
-                  <div>
-                    <h3 className="font-arabic text-base text-white">
-                      {settings.language === "ar" ? "صوت الأذان" : "Adhan Sound"}
-                    </h3>
-                    <p className="text-sm text-white/50">
-                      {settings.language === "ar" ? "تشغيل صوت الأذان" : "Play adhan sound"}
-                    </p>
-                  </div>
-                </div>
-                <Switch 
-                  checked={settings.notifications.adhanSound} 
-                  onCheckedChange={(checked) => updateNotificationSettings({ adhanSound: checked })}
-                  className="data-[state=checked]:bg-amber-600"
-                />
-              </div>
-            </div>
-          )}
           
           {/* Appearance */}
           <div 

@@ -160,6 +160,27 @@ const PrayerTimes = () => {
     }
   };
 
+  // Navigate to notification settings for a specific prayer
+  const goToNotificationSettings = (prayerName: string) => {
+    const prayerMap: Record<string, string> = {
+      'الفجر': 'fajr',
+      'Fajr': 'fajr',
+      'الشروق': 'sunrise',
+      'Sunrise': 'sunrise',
+      'الظهر': 'dhuhr',
+      'Dhuhr': 'dhuhr',
+      'العصر': 'asr',
+      'Asr': 'asr',
+      'المغرب': 'maghrib',
+      'Maghrib': 'maghrib',
+      'العشاء': 'isha',
+      'Isha': 'isha'
+    };
+    
+    const route = `/notification-settings/${prayerMap[prayerName] || 'fajr'}`;
+    navigate(route);
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-900 to-slate-950 text-white flex flex-col">
       {/* Sub Header */}
@@ -169,49 +190,9 @@ const PrayerTimes = () => {
         </button>
         <h2 className="text-xl font-arabic font-bold">{t('prayerTimes')}</h2>
         <div className="relative">
-          <button onClick={toggleNotifications} className="p-2">
+          <button onClick={() => navigate('/notifications')} className="p-2">
             <Bell className={`w-5 h-5 ${settings.notifications.prayerReminders ? "text-amber-400" : "text-gray-300"}`} />
           </button>
-          
-          {/* Notification Options Dropdown */}
-          {showNotificationOptions && (
-            <div className="absolute top-full right-0 mt-2 z-50 w-64 bg-slate-800 border border-slate-700 rounded-lg shadow-lg">
-              <div className="p-3 border-b border-slate-700">
-                <h3 className="font-arabic text-amber-400">
-                  {settings.language === "ar" ? "إعدادات الإشعارات" : "Notification Settings"}
-                </h3>
-              </div>
-              <div className="p-2">
-                <button 
-                  onClick={() => enableNotifications('atAdhan')}
-                  className={`w-full text-left p-2.5 hover:bg-slate-700 rounded-md transition-colors
-                    ${settings.notifications.reminderType === 'atAdhan' ? 'bg-amber-900/30 text-amber-400' : ''}`}
-                >
-                  {settings.language === "ar" ? "عند الأذان" : "At Adhan Time"}
-                </button>
-                <button 
-                  onClick={() => enableNotifications('iqamah')}
-                  className={`w-full text-left p-2.5 hover:bg-slate-700 rounded-md transition-colors
-                    ${settings.notifications.reminderType === 'iqamah' ? 'bg-amber-900/30 text-amber-400' : ''}`}
-                >
-                  {settings.language === "ar" ? "عند الإقامة" : "At Iqamah Time"}
-                </button>
-                <button 
-                  onClick={() => enableNotifications('both')}
-                  className={`w-full text-left p-2.5 hover:bg-slate-700 rounded-md transition-colors
-                    ${settings.notifications.reminderType === 'both' ? 'bg-amber-900/30 text-amber-400' : ''}`}
-                >
-                  {settings.language === "ar" ? "الأذان والإقامة معاً" : "Both Adhan & Iqamah"}
-                </button>
-                <button 
-                  onClick={() => enableNotifications('none')}
-                  className="w-full text-left p-2.5 text-red-400 hover:bg-slate-700 rounded-md transition-colors mt-1"
-                >
-                  {settings.language === "ar" ? "إيقاف الإشعارات" : "Turn Off Notifications"}
-                </button>
-              </div>
-            </div>
-          )}
         </div>
       </div>
       
@@ -263,6 +244,7 @@ const PrayerTimes = () => {
                   ? 'bg-amber-900/20 border border-amber-700/50' 
                   : 'bg-slate-800/50'
               }`}
+              onClick={() => goToNotificationSettings(prayer.name)}
             >
               <div className="text-left">
                 <span className={`text-xl font-arabic ${
@@ -328,6 +310,22 @@ const PrayerTimes = () => {
                 : "Monthly Prayer Times Calendar"}
             </span>
             <ChevronRight className="w-5 h-5 text-amber-400" />
+          </button>
+        </div>
+        
+        {/* Notifications Link */}
+        <div className="mt-4">
+          <button
+            onClick={() => navigate("/notifications")}
+            className="flex items-center justify-between w-full bg-gradient-to-br from-slate-800/60 to-slate-800/20 p-4 rounded-lg border border-blue-800/30"
+          >
+            <Bell className="w-5 h-5 text-blue-400" />
+            <span className="text-blue-400 font-arabic">
+              {settings.language === "ar" 
+                ? "إعدادات منبه الأذكار والأذان" 
+                : "Azkar & Adhan Notification Settings"}
+            </span>
+            <ChevronRight className="w-5 h-5 text-blue-400" />
           </button>
         </div>
       </div>

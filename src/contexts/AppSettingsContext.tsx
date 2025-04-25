@@ -20,6 +20,12 @@ export interface AppSettings {
     reminderTime: number; // minutes before prayer
     adhanSound: boolean;
     reminderType: 'atAdhan' | 'iqamah' | 'both' | 'none';
+    iqamahTime?: number; // minutes after adhan
+    urgentNotifications?: boolean; // notifications stay on lock screen
+    customSounds?: {
+      [key: string]: string; // prayer/notification type to sound id mapping
+    };
+    activeReminders?: string[]; // IDs of active reminders
   };
   // Appearance settings
   appearance: {
@@ -58,7 +64,11 @@ const defaultSettings: AppSettings = {
     azkarReminders: false,
     reminderTime: 10,
     adhanSound: true,
-    reminderType: 'atAdhan'
+    reminderType: 'atAdhan',
+    iqamahTime: 10,
+    urgentNotifications: false,
+    customSounds: {},
+    activeReminders: []
   },
   appearance: {
     darkMode: true,

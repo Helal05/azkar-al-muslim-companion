@@ -22,6 +22,8 @@ import MonthlyPrayerTimes from "./pages/MonthlyPrayerTimes";
 import Search from "./pages/Search";
 import NamesOfAllah from "./pages/NamesOfAllah";
 import NightDuas from "./pages/NightDuas";
+import NotificationsHub from "./pages/NotificationsHub";
+import NotificationsManager from "./pages/NotificationsManager";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -56,6 +58,8 @@ const App = () => (
             <Route path="/favorites" element={<Favorites />} />
             <Route path="/search" element={<Search />} />
             <Route path="/names-of-allah" element={<NamesOfAllah />} />
+            <Route path="/notifications" element={<NotificationsHub />} />
+            <Route path="/notification-settings/:notificationType" element={<NotificationsManager />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
