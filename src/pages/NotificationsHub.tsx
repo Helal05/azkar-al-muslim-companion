@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import {
-  Bell, ChevronLeft, Settings, BellOff, ChevronRight, Volume, X, Clock, Calendar
+  Bell, ChevronLeft, Settings, BellOff, ChevronRight, Volume, X, Clock, Calendar, Check
 } from "lucide-react";
 import { useAppSettings } from "../contexts/AppSettingsContext";
 import { useTranslation } from "../utils/translations";
