@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client'
 import { BrowserRouter } from 'react-router-dom'
 import App from './App.tsx'
 import './index.css'
+import { AppSettingsProvider } from './contexts/AppSettingsContext'
 
 // Check for saved theme preference
 const savedTheme = localStorage.getItem("azkar-app-settings");
@@ -54,6 +55,8 @@ if (savedTheme) {
 
 createRoot(document.getElementById("root")!).render(
   <BrowserRouter>
-    <App />
+    <AppSettingsProvider>
+      <App />
+    </AppSettingsProvider>
   </BrowserRouter>
 );
