@@ -1,160 +1,141 @@
 
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import { duaCategories } from "../data/duaData";
-import { naturalBackgrounds } from "../data/duaData";
-import { Search, ChevronLeft } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
+import {
+  Moon,
+  Sun,
+  BookOpenText,
+  Settings,
+  Bell,
+  Heart,
+  SquareAsterisk,
+  Clock,
+  Prayer,
+  ChevronRight,
+  Compass
+} from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
+import { useAppSettings } from "../contexts/AppSettingsContext";
+import QuranVerse from "../components/QuranVerse";
 
 const More = () => {
   const navigate = useNavigate();
-  const [searchQuery, setSearchQuery] = useState("");
-  const [filteredCategories, setFilteredCategories] = useState(duaCategories);
-  const [backgroundIndex, setBackgroundIndex] = useState(0);
+  const { settings } = useAppSettings();
+  const { toast } = useToast();
   
-  useEffect(() => {
-    // Change background periodically
-    const bgInterval = setInterval(() => {
-      setBackgroundIndex((prev) => (prev + 1) % naturalBackgrounds.length);
-    }, 120000); // Change background every 2 minutes
-
-    return () => {
-      clearInterval(bgInterval);
-    };
-  }, []);
-  
-  useEffect(() => {
-    if (searchQuery) {
-      const filtered = duaCategories.filter(category => 
-        category.name.includes(searchQuery) || 
-        category.duas.some(dua => 
-          dua.title.includes(searchQuery) || 
-          dua.arabic.includes(searchQuery)
-        )
-      );
-      setFilteredCategories(filtered);
-    } else {
-      setFilteredCategories(duaCategories);
-    }
-  }, [searchQuery]);
-  
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    // Search handled by the useEffect above
+  const handleSectionClick = (path: string) => {
+    navigate(path);
   };
   
-  const handleSelectCategory = (categoryId: string) => {
-    navigate(`/dua-category/${categoryId}`);
-  };
-  
-  // Share functionality
-  const shareContent = (categoryId: string, categoryName: string) => {
-    if (navigator.share) {
-      navigator.share({
-        title: categoryName,
-        text: `مشاركة ${categoryName} من تطبيق أذكاري`,
-        url: `${window.location.origin}/dua-category/${categoryId}`,
-      }).catch(err => console.error("Error sharing:", err));
-    }
-  };
-
   return (
     <div className="min-h-screen bg-black flex flex-col">
       {/* Header */}
-      <div className="bg-black text-white p-4 flex items-center justify-between">
-        <button onClick={() => navigate("/")} className="p-2">
-          <ChevronLeft className="w-5 h-5" />
-        </button>
-        <h2 className="text-xl font-arabic font-bold">المنوعة</h2>
-        <div className="w-5"></div> {/* Placeholder for alignment */}
+      <div className="bg-black text-white p-4 flex items-center justify-center">
+        <h2 className="text-xl font-arabic font-bold">المزيد</h2>
       </div>
       
-      {/* Search */}
-      <div className="bg-black px-4 py-3">
-        <form onSubmit={handleSearch} className="relative">
-          <input
-            type="text"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="ابحث ..."
-            className="w-full bg-gray-900 text-white rounded-lg py-2 px-4 font-arabic text-right"
-          />
-          <button
-            type="submit"
-            className="absolute left-2 top-1/2 transform -translate-y-1/2"
+      {/* Quote Banner */}
+      <div className="p-4">
+        <QuranVerse />
+      </div>
+      
+      {/* Menu Grid */}
+      <div className="flex-1 p-4">
+        <div className="grid grid-cols-2 gap-4">
+          <Link 
+            to="/names-of-allah" 
+            className="bg-blue-900/30 hover:bg-blue-800/30 rounded-lg p-4 flex flex-col items-center justify-center transition-colors"
           >
-            <Search className="h-5 w-5 text-gray-400" />
-          </button>
-        </form>
-      </div>
-      
-      {/* Dua Categories Grid */}
-      <div className="flex-1 bg-black p-3 overflow-y-auto">
-        <div className="grid grid-cols-2 gap-3">
-          {filteredCategories.map((category, index) => (
-            <div 
-              key={category.id}
-              className="rounded-lg overflow-hidden"
-              onClick={() => handleSelectCategory(category.id)}
-              style={{
-                backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url(${naturalBackgrounds[(index + backgroundIndex) % naturalBackgrounds.length]})`,
-                backgroundSize: 'cover',
-                backgroundPosition: 'center'
-              }}
-            >
-              <div className="p-4 flex flex-col items-center">
-                <h3 className="text-center font-arabic text-lg font-bold text-white">
-                  {category.name}
-                </h3>
-                <p className="text-xs text-gray-300 mt-2">
-                  {category.duas.length} دعاء
-                </p>
-                <button 
-                  className="mt-3 text-xs bg-white/20 px-3 py-1 rounded-full text-white"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    shareContent(category.id, category.name);
-                  }}
-                >
-                  مشاركة
-                </button>
-              </div>
+            <div className="w-12 h-12 rounded-full bg-blue-900/50 flex items-center justify-center mb-2">
+              <SquareAsterisk className="w-6 h-6 text-blue-400" />
             </div>
-          ))}
+            <span className="text-white font-arabic text-center">أسماء الله الحسنى</span>
+          </Link>
+          
+          <Link 
+            to="/notifications-hub" 
+            className="bg-purple-900/30 hover:bg-purple-800/30 rounded-lg p-4 flex flex-col items-center justify-center transition-colors"
+          >
+            <div className="w-12 h-12 rounded-full bg-purple-900/50 flex items-center justify-center mb-2">
+              <Bell className="w-6 h-6 text-purple-400" />
+            </div>
+            <span className="text-white font-arabic text-center">إشعارات التطبيق</span>
+          </Link>
+          
+          <Link 
+            to="/qibla" 
+            className="bg-green-900/30 hover:bg-green-800/30 rounded-lg p-4 flex flex-col items-center justify-center transition-colors"
+          >
+            <div className="w-12 h-12 rounded-full bg-green-900/50 flex items-center justify-center mb-2">
+              <Compass className="w-6 h-6 text-green-400" />
+            </div>
+            <span className="text-white font-arabic text-center">القبلة</span>
+          </Link>
+          
+          <Link 
+            to="/favorites" 
+            className="bg-red-900/30 hover:bg-red-800/30 rounded-lg p-4 flex flex-col items-center justify-center transition-colors"
+          >
+            <div className="w-12 h-12 rounded-full bg-red-900/50 flex items-center justify-center mb-2">
+              <Heart className="w-6 h-6 text-red-400" />
+            </div>
+            <span className="text-white font-arabic text-center">المفضلة</span>
+          </Link>
+          
+          <Link 
+            to="/night-duas" 
+            className="bg-indigo-900/30 hover:bg-indigo-800/30 rounded-lg p-4 flex flex-col items-center justify-center transition-colors"
+          >
+            <div className="w-12 h-12 rounded-full bg-indigo-900/50 flex items-center justify-center mb-2">
+              <Moon className="w-6 h-6 text-indigo-400" />
+            </div>
+            <span className="text-white font-arabic text-center">أدعية الليل</span>
+          </Link>
+          
+          <Link 
+            to="/duha-prayer" 
+            className="bg-amber-900/30 hover:bg-amber-800/30 rounded-lg p-4 flex flex-col items-center justify-center transition-colors"
+          >
+            <div className="w-12 h-12 rounded-full bg-amber-900/50 flex items-center justify-center mb-2">
+              <Sun className="w-6 h-6 text-amber-400" />
+            </div>
+            <span className="text-white font-arabic text-center">صلاة الضحى</span>
+          </Link>
+          
+          <Link 
+            to="/sunnah-prayers" 
+            className="bg-teal-900/30 hover:bg-teal-800/30 rounded-lg p-4 flex flex-col items-center justify-center transition-colors"
+          >
+            <div className="w-12 h-12 rounded-full bg-teal-900/50 flex items-center justify-center mb-2">
+              <Prayer className="w-6 h-6 text-teal-400" />
+            </div>
+            <span className="text-white font-arabic text-center">السنن الرواتب</span>
+          </Link>
+          
+          <Link 
+            to="/friday-sunnah" 
+            className="bg-amber-800/30 hover:bg-amber-700/30 rounded-lg p-4 flex flex-col items-center justify-center transition-colors"
+          >
+            <div className="w-12 h-12 rounded-full bg-amber-900/50 flex items-center justify-center mb-2">
+              <Moon className="w-6 h-6 text-amber-400" />
+            </div>
+            <span className="text-white font-arabic text-center">سنن يوم الجمعة</span>
+          </Link>
         </div>
-      </div>
-      
-      {/* Bottom Navigation */}
-      <div className="bg-black text-white py-3 flex justify-around">
-        <button 
-          onClick={() => navigate("/more")}
-          className="flex flex-col items-center text-xs"
-        >
-          <span className="text-amber-400 font-arabic">المنوعة</span>
-        </button>
-        <button 
-          onClick={() => navigate("/qibla")}
-          className="flex flex-col items-center text-xs"
-        >
-          <span className="text-gray-300 font-arabic">القبلة</span>
-        </button>
-        <button 
-          onClick={() => navigate("/prayer-times")}
-          className="flex flex-col items-center text-xs"
-        >
-          <span className="text-gray-300 font-arabic">الصلاة</span>
-        </button>
-        <button 
-          onClick={() => navigate("/favorites")}
-          className="flex flex-col items-center text-xs"
-        >
-          <span className="text-gray-300 font-arabic">المفضلة</span>
-        </button>
-        <button 
-          onClick={() => navigate("/tasbih")}
-          className="flex flex-col items-center text-xs"
-        >
-          <span className="text-gray-300 font-arabic">العداد</span>
-        </button>
+        
+        {/* Settings List */}
+        <div className="mt-8">
+          <div 
+            onClick={() => navigate("/settings")}
+            className="flex justify-between items-center p-4 bg-gray-900/30 rounded-lg mb-3"
+          >
+            <div className="flex items-center">
+              <Settings className="w-5 h-5 text-gray-400 mr-3" />
+              <span className="font-arabic text-white">الإعدادات</span>
+            </div>
+            <ChevronRight className="w-5 h-5 text-gray-400" />
+          </div>
+        </div>
       </div>
     </div>
   );

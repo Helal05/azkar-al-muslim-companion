@@ -1,4 +1,3 @@
-
 export interface Dua {
   id: string;
   title: string;
@@ -160,6 +159,38 @@ export const duaCategories: DuaCategory[] = [
         reference: "رواه الترمذي"
       }
     ]
+  },
+  {
+    id: "jummah",
+    name: "أدعية يوم الجمعة",
+    backgroundColor: "bg-gradient-to-br from-amber-500 to-amber-700",
+    duas: [
+      {
+        id: "jummah-1",
+        title: "دعاء يوم الجمعة 1",
+        arabic: "اللَّهُمَّ أَصْلِحْ لِي دِينِي الَّذِي هُوَ عِصْمَةُ أَمْرِي، وَأَصْلِحْ لِي دُنْيَايَ الَّتِي فِيهَا مَعَاشِي",
+        translation: "O Allah, rectify my religion which is the safeguard of my affairs, and rectify my world wherein is my livelihood",
+        source: "صحيح مسلم",
+        reference: "رواه مسلم"
+      },
+      {
+        id: "jummah-2",
+        title: "دعاء يوم الجمعة 2",
+        arabic: "اللَّهُمَّ إِنِّي أَسْأَلُكَ الْعَافِيَةَ فِي الدُّنْيَا وَالْآخِرَةِ",
+        translation: "O Allah, I ask You for well-being in this world and in the Hereafter",
+        source: "الترمذي",
+        reference: "رواه الترمذي"
+      },
+      {
+        id: "jummah-3",
+        title: "دعاء ساعة الإجابة",
+        arabic: "اللَّهُمَّ اغْفِرْ لِي، وَاهْدِنِي، وَارْزُقْنِي، وَعَافِنِي، أَعُوذُ بِاللَّهِ مِنْ ضِيقِ الْمَقَامِ يَوْمَ الْقِيَامَةِ",
+        translation: "O Allah, forgive me, guide me, provide for me, and protect me. I seek refuge in Allah from the hardship of the standing on the Day of Resurrection",
+        source: "ابن ماجه",
+        reference: "رواه ابن ماجه",
+        virtue: "من الأدعية المستحبة في ساعة الإجابة يوم الجمعة"
+      }
+    ]
   }
 ];
 
@@ -217,7 +248,7 @@ export const quranVerses = [
     ayah: 6
   },
   {
-    verse: "وَإِنْ تَعُدُّوا نِعْمَةَ اللَّهِ لَا تُحْصُوهَا",
+    verse: "وَإِنْ تَعُدُّوا نِعْمَةَ اللَ��هِ لَا تُحْصُوهَا",
     surah: "إبراهيم",
     ayah: 34
   },
