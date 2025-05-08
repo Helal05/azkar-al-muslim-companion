@@ -10,7 +10,7 @@ import {
   Heart,
   SquareAsterisk,
   Clock,
-  Prayer,
+  BookOpen, // Changed from Prayer to BookOpen which is more appropriate for prayer
   ChevronRight,
   Compass
 } from "lucide-react";
@@ -107,7 +107,7 @@ const More = () => {
             className="bg-teal-900/30 hover:bg-teal-800/30 rounded-lg p-4 flex flex-col items-center justify-center transition-colors"
           >
             <div className="w-12 h-12 rounded-full bg-teal-900/50 flex items-center justify-center mb-2">
-              <Prayer className="w-6 h-6 text-teal-400" />
+              <BookOpen className="w-6 h-6 text-teal-400" />
             </div>
             <span className="text-white font-arabic text-center">السنن الرواتب</span>
           </Link>

@@ -1,12 +1,12 @@
 
-import { Gesture, ChevronLeft, ChevronRight, Settings } from "lucide-react";
+import { Hand, ChevronLeft, ChevronRight, Settings } from "lucide-react";
 
 const AdhkarInstructions = () => {
   return (
     <div className="text-right font-arabic space-y-6 py-2">
       <div className="flex items-center space-x-4 space-x-reverse">
         <div className="bg-gray-800 p-3 rounded-full">
-          <Gesture className="w-6 h-6" />
+          <Hand className="w-6 h-6" />
         </div>
         <div>
           <p className="font-bold">المس الشاشة مرة واحدة</p>
@@ -26,7 +26,7 @@ const AdhkarInstructions = () => {
       
       <div className="flex items-center space-x-4 space-x-reverse">
         <div className="bg-gray-800 p-3 rounded-full">
-          <Gesture className="w-6 h-6 rotate-90" />
+          <Hand className="w-6 h-6 rotate-90" />
         </div>
         <div>
           <p className="font-bold">حرك إلى فوق أو تحت</p>
